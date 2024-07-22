@@ -1,0 +1,23 @@
+{
+    "Version": "1.2",
+    "Data": {
+        "Source": "e:\\unreal\\projects\\panacea\\source\\panacea\\panaceaprojectile.cpp",
+        "ProvidedModule": "",
+        "PCH": "e:\\unreal\\projects\\panacea\\intermediate\\build\\win64\\x64\\panaceaeditor\\development\\engine\\sharedpch.engine.cpp20.h.pch",
+        "Includes": [
+            "e:\\unreal\\projects\\panacea\\intermediate\\build\\win64\\x64\\unrealeditor\\development\\panacea\\definitions.panacea.h",
+            "e:\\unreal\\projects\\panacea\\source\\panacea\\panaceaprojectile.h",
+            "e:\\unreal\\projects\\panacea\\intermediate\\build\\win64\\unrealeditor\\inc\\panacea\\uht\\panaceaprojectile.generated.h",
+            "e:\\unreal\\program\\ue_5.3\\engine\\source\\runtime\\engine\\classes\\gameframework\\projectilemovementcomponent.h",
+            "e:\\unreal\\program\\ue_5.3\\engine\\source\\runtime\\engine\\classes\\gameframework\\movementcomponent.h",
+            "e:\\unreal\\program\\ue_5.3\\engine\\intermediate\\build\\win64\\unrealeditor\\inc\\engine\\uht\\movementcomponent.generated.h",
+            "e:\\unreal\\program\\ue_5.3\\engine\\intermediate\\build\\win64\\unrealeditor\\inc\\engine\\uht\\projectilemovementcomponent.generated.h",
+            "e:\\unreal\\program\\ue_5.3\\engine\\source\\runtime\\engine\\classes\\components\\spherecomponent.h",
+            "e:\\unreal\\program\\ue_5.3\\engine\\source\\runtime\\engine\\classes\\components\\shapecomponent.h",
+            "e:\\unreal\\program\\ue_5.3\\engine\\intermediate\\build\\win64\\unrealeditor\\inc\\engine\\uht\\shapecomponent.generated.h",
+            "e:\\unreal\\program\\ue_5.3\\engine\\intermediate\\build\\win64\\unrealeditor\\inc\\engine\\uht\\spherecomponent.generated.h"
+        ],
+        "ImportedModules": [],
+        "ImportedHeaderUnits": []
+    }
+}

@@ -1,0 +1,23 @@
+{
+    "Version": "1.2",
+    "Data": {
+        "Source": "e:\\unreal\\projects\\panacea\\intermediate\\build\\win64\\unrealeditor\\inc\\panacea\\uht\\panaceacharacter.gen.cpp",
+        "ProvidedModule": "",
+        "PCH": "e:\\unreal\\projects\\panacea\\intermediate\\build\\win64\\x64\\panaceaeditor\\development\\engine\\sharedpch.engine.cpp20.h.pch",
+        "Includes": [
+            "e:\\unreal\\projects\\panacea\\intermediate\\build\\win64\\x64\\unrealeditor\\development\\panacea\\definitions.panacea.h",
+            "e:\\unreal\\projects\\panacea\\source\\panacea\\panaceacharacter.h",
+            "e:\\unreal\\program\\ue_5.3\\engine\\source\\runtime\\engine\\classes\\gameframework\\character.h",
+            "e:\\unreal\\program\\ue_5.3\\engine\\source\\runtime\\engine\\classes\\gameframework\\charactermovementreplication.h",
+            "e:\\unreal\\program\\ue_5.3\\engine\\source\\runtime\\experimental\\iris\\core\\public\\iris\\serialization\\irisobjectreferencepackagemap.h",
+            "e:\\unreal\\program\\ue_5.3\\engine\\intermediate\\build\\win64\\unrealeditor\\inc\\iriscore\\uht\\irisobjectreferencepackagemap.generated.h",
+            "e:\\unreal\\program\\ue_5.3\\engine\\intermediate\\build\\win64\\unrealeditor\\inc\\engine\\uht\\charactermovementreplication.generated.h",
+            "e:\\unreal\\program\\ue_5.3\\engine\\source\\runtime\\engine\\classes\\gameframework\\rootmotionsource.h",
+            "e:\\unreal\\program\\ue_5.3\\engine\\intermediate\\build\\win64\\unrealeditor\\inc\\engine\\uht\\rootmotionsource.generated.h",
+            "e:\\unreal\\program\\ue_5.3\\engine\\intermediate\\build\\win64\\unrealeditor\\inc\\engine\\uht\\character.generated.h",
+            "e:\\unreal\\projects\\panacea\\intermediate\\build\\win64\\unrealeditor\\inc\\panacea\\uht\\panaceacharacter.generated.h"
+        ],
+        "ImportedModules": [],
+        "ImportedHeaderUnits": []
+    }
+}
