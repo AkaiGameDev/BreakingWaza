@@ -1,8 +1,0 @@
-{
-	"SourceFiles": [
-		"E:\\Unreal\\Projects\\Panacea\\Source\\Panacea\\Panacea.Build.cs",
-		"E:\\Unreal\\Projects\\Panacea\\Source\\Panacea.Target.cs",
-		"E:\\Unreal\\Projects\\Panacea\\Source\\PanaceaEditor.Target.cs"
-	],
-	"EngineVersion": "5.3.2"
-}
