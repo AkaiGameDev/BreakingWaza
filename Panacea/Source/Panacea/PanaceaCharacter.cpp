@@ -10,6 +10,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
 #include "Engine/LocalPlayer.h"
+#include "Kismet/GameplayStatics.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -68,6 +69,9 @@ void APanaceaCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 
 		// Looking
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &APanaceaCharacter::Look);
+
+		//Reset Sequence
+		EnhancedInputComponent->BindAction(RestartAction, ETriggerEvent::Triggered, this, &APanaceaCharacter::OnRestart);
 	}
 	else
 	{
@@ -100,5 +104,11 @@ void APanaceaCharacter::Look(const FInputActionValue& Value)
 		AddControllerYawInput(LookAxisVector.X);
 		AddControllerPitchInput(LookAxisVector.Y);
 	}
+}
+
+
+void APanaceaCharacter::OnRestart()
+{
+	UGameplayStatics::OpenLevel(this, FName(*GetWorld()->GetName()), false);
 }
 

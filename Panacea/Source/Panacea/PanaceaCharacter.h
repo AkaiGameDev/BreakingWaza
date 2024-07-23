@@ -49,12 +49,19 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* LookAction;
 
+	/** Restart Input Action */
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	UInputAction* RestartAction;
+
 protected:
 	/** Called for movement input */
 	void Move(const FInputActionValue& Value);
 
 	/** Called for looking input */
 	void Look(const FInputActionValue& Value);
+
+	/** Called When Player Restarts Game */
+	void OnRestart();
 
 protected:
 	// APawn interface
