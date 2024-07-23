@@ -75,6 +75,11 @@ void UMouseDragObjectsComponent::TickComponent(float DeltaTime, ELevelTick TickT
 
 	PlayerController->DeprojectMousePositionToWorld(WorldPosition, WorldDirection);
 
+	if (WorldPosition.IsNearlyZero())
+	{
+		return;
+	}
+
 	FVector TargetLocation = WorldPosition + WorldDirection * OriginalDistanceToComponent;
 
 	PhysicsHandle->SetTargetLocation(TargetLocation);
@@ -88,9 +93,9 @@ void UMouseDragObjectsComponent::TickComponent(float DeltaTime, ELevelTick TickT
 	FVector Position;
 	FVector Direction;
 
-	PlayerController->DeprojectMousePositionToWorld(Position, Direction);
+	PlayerController->DeprojectMousePositionToWorld(Position, Direction);*/
 
-	UE_LOG(LogTemp, Log, TEXT("Position: X=%f, Y=%f, Z=%f"), Position.X, Position.Y, Position.Z);*/
+	UE_LOG(LogTemp, Log, TEXT("Position: X=%f, Y=%f, Z=%f"), WorldPosition.X, WorldPosition.Y, WorldPosition.Z);
 
 }
 
@@ -100,7 +105,7 @@ void UMouseDragObjectsComponent::SwitchGrabMode()
 	bIsGrabMode = !bIsGrabMode;
 	if (bIsGrabMode)
 	{
-		// Set input mode to UI only
+		// Set input mode to UI and Game
 		FInputModeGameAndUI InputMode;
 		InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
 		InputMode.SetHideCursorDuringCapture(false);
@@ -206,5 +211,6 @@ void UMouseDragObjectsComponent::ReleaseComponent()
 	}
 
 	PhysicsHandle->ReleaseComponent();
+	GrabbedComponent = nullptr;
 }
 
