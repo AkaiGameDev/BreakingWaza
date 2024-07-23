@@ -68,17 +68,14 @@ void UTP_WeaponComponent::AttachWeapon(APanaceaCharacter* TargetCharacter)
 	Character = TargetCharacter;
 
 	// Check that the character is valid, and has no rifle yet
-	if (Character == nullptr || Character->GetHasRifle())
-	{
-		return;
-	}
+
 
 	// Attach the weapon to the First Person Character
 	FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, true);
 	AttachToComponent(Character->GetMesh1P(), AttachmentRules, FName(TEXT("GripPoint")));
 	
 	// switch bHasRifle so the animation blueprint can switch to another animation set
-	Character->SetHasRifle(true);
+
 
 	// Set up action bindings
 	if (APlayerController* PlayerController = Cast<APlayerController>(Character->GetController()))

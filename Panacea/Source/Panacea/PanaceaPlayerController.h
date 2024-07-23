@@ -15,7 +15,7 @@ UCLASS()
 class PANACEA_API APanaceaPlayerController : public APlayerController
 {
 	GENERATED_BODY()
-	
+
 protected:
 
 	/** Input Mapping Context to be used for player input */

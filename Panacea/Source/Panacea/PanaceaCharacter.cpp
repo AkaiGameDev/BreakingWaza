@@ -10,6 +10,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
 #include "Engine/LocalPlayer.h"
+#include "Kismet/GameplayStatics.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -18,9 +19,7 @@ DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
 APanaceaCharacter::APanaceaCharacter()
 {
-	// Character doesnt have a rifle at start
-	bHasRifle = false;
-	
+
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(55.f, 96.0f);
 		
@@ -64,15 +63,15 @@ void APanaceaCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	// Set up action bindings
 	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent))
 	{
-		// Jumping
-		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ACharacter::Jump);
-		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
 
 		// Moving
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &APanaceaCharacter::Move);
 
 		// Looking
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &APanaceaCharacter::Look);
+
+		//Reset Sequence
+		EnhancedInputComponent->BindAction(RestartAction, ETriggerEvent::Triggered, this, &APanaceaCharacter::OnRestart);
 	}
 	else
 	{
@@ -107,12 +106,9 @@ void APanaceaCharacter::Look(const FInputActionValue& Value)
 	}
 }
 
-void APanaceaCharacter::SetHasRifle(bool bNewHasRifle)
+
+void APanaceaCharacter::OnRestart()
 {
-	bHasRifle = bNewHasRifle;
+	UGameplayStatics::OpenLevel(this, FName(*GetWorld()->GetName()), false);
 }
 
-bool APanaceaCharacter::GetHasRifle()
-{
-	return bHasRifle;
-}
