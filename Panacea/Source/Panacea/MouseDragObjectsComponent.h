@@ -2,6 +2,7 @@
 
 #pragma once
 #include "PanaceaCharacter.h"
+#include "PhysicsEngine/PhysicsHandleComponent.h"
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
@@ -24,7 +25,7 @@ public:
 	void SwitchGrabMode();
 
 	// Traces line from mouse cursor location forward to find Component to grab
-	void FindComponent();
+	UPrimitiveComponent* FindComponent(FHitResult& HitResult);
 
 	// Grabs Component that simulates physics
 	void GrabComponent();
@@ -35,6 +36,9 @@ public:
 	// MappingContext 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputMappingContext* MouseDragObjectsMappingContext;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputMappingContext* DefaultMappingContext;
 
 	// Mouse click Input Action
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
@@ -52,7 +56,13 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 private:
+	// Physics Handle Component
+	UPROPERTY(VisibleAnywhere)
+	UPhysicsHandleComponent* PhysicsHandle;
+
 	APanaceaCharacter* Character;
+	APlayerController* PlayerController;
+	UPrimitiveComponent* GrabbedComponent;
 	bool bIsGrabMode;
 	float OriginalDistanceToComponent;
 
