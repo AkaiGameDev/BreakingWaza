@@ -37,9 +37,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputMappingContext* MouseDragObjectsMappingContext;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	UInputMappingContext* DefaultMappingContext;
-
 	// Mouse click Input Action
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* GrabObjectAction;
@@ -62,6 +59,7 @@ private:
 
 	APanaceaCharacter* Character;
 	APlayerController* PlayerController;
+	UInputMappingContext* CharacterDefaultMappingContext;
 	UPrimitiveComponent* GrabbedComponent;
 	bool bIsGrabMode;
 	float OriginalDistanceToComponent;

@@ -5,6 +5,8 @@
 #include "PhysicsEngine/PhysicsHandleComponent.h"
 #include "GrabbingSystemComponent.generated.h"
 
+class UInputAction;
+
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class PANACEA_API UGrabbingSystemComponent : public UActorComponent
 {
@@ -13,6 +15,10 @@ class PANACEA_API UGrabbingSystemComponent : public UActorComponent
 public:
 
 	UGrabbingSystemComponent();
+
+	/** Grab Input Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* GrabAction;
 
 protected:
 
@@ -29,7 +35,7 @@ private:
 
 	// Input Component
 	UPROPERTY()
-	UInputComponent* InputComponent = nullptr;
+	UEnhancedInputComponent* InputComponent = nullptr;
 
 	// Ray-cast and grab what's in reach
 	void Grab();

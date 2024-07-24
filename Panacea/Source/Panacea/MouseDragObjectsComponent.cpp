@@ -18,7 +18,7 @@ UMouseDragObjectsComponent::UMouseDragObjectsComponent()
 
 	bIsGrabMode = false;
 
-	PhysicsHandle = CreateDefaultSubobject<UPhysicsHandleComponent>(TEXT("PhysicsHandle"));
+	PhysicsHandle = CreateDefaultSubobject<UPhysicsHandleComponent>(TEXT("MousePhysicsHandle"));
 }
 
 void UMouseDragObjectsComponent::SetInitilizeReferences()
@@ -36,6 +36,7 @@ void UMouseDragObjectsComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
+	CharacterDefaultMappingContext = Character->GetDefaultMappingContext();
 
 	PlayerController = Cast<APlayerController>(Character->GetController());
 	if (PlayerController)
@@ -116,7 +117,7 @@ void UMouseDragObjectsComponent::SwitchGrabMode()
 
 		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
 		{
-			Subsystem->RemoveMappingContext(DefaultMappingContext);
+			Subsystem->RemoveMappingContext(CharacterDefaultMappingContext);
 		}
 
 
@@ -132,7 +133,7 @@ void UMouseDragObjectsComponent::SwitchGrabMode()
 
 		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
 		{
-			Subsystem->AddMappingContext(DefaultMappingContext, 0);
+			Subsystem->AddMappingContext(CharacterDefaultMappingContext, 0);
 		}
 	}
 }
@@ -178,13 +179,13 @@ void UMouseDragObjectsComponent::GrabComponent()
 
 	FHitResult HitResult;
 	GrabbedComponent = FindComponent(HitResult);
-	
+
 	if (!GrabbedComponent)
 	{
 		UE_LOG(LogTemp, Log, TEXT("UMouseDragObjectsComponent::GrabComponent(): No component was found to grab"));
 		return;
 	}
-	
+
 	OriginalDistanceToComponent = HitResult.Distance;
 
 	if (GrabbedComponent->Mobility != EComponentMobility::Movable)
