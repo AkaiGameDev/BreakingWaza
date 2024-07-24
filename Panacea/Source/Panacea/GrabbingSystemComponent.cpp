@@ -4,6 +4,7 @@
 #include "DrawDebugHelpers.h"
 #include "GameFramework/PlayerController.h"
 #include "Components/InputComponent.h"
+#include <EnhancedInputComponent.h>
 
 // Sets default values for this component's properties
 UGrabbingSystemComponent::UGrabbingSystemComponent()
@@ -75,10 +76,10 @@ void UGrabbingSystemComponent::FindPhysicsHandle()
 
 void UGrabbingSystemComponent::SetupInputComponent()
 {
-    InputComponent = GetOwner()->FindComponentByClass<UInputComponent>();
+    InputComponent = GetOwner()->FindComponentByClass<UEnhancedInputComponent>();
     if (InputComponent)
     {
-        InputComponent->BindAction("Grab", IE_Pressed, this, &UGrabbingSystemComponent::Grab);
+        InputComponent->BindAction(GrabAction, ETriggerEvent::Triggered, this, &UGrabbingSystemComponent::Grab);
     }
     else
     {

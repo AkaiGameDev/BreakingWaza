@@ -12,6 +12,9 @@
 #include "Engine/LocalPlayer.h"
 #include "Kismet/GameplayStatics.h"
 
+#include "GrabbingSystemComponent.h"
+#include "MouseDragObjectsComponent.h"
+
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
 //////////////////////////////////////////////////////////////////////////
@@ -38,6 +41,12 @@ APanaceaCharacter::APanaceaCharacter()
 	//Mesh1P->SetRelativeRotation(FRotator(0.9f, -19.19f, 5.2f));
 	Mesh1P->SetRelativeLocation(FVector(-30.f, 0.f, -150.f));
 
+	MouseDragObjectsComponent = CreateDefaultSubobject<UMouseDragObjectsComponent>(TEXT("MouseDragObjectsComponent"));
+	MouseDragObjectsComponent->SetInitilizeReferences();
+
+	GrabbingSystemComponent = CreateDefaultSubobject<UGrabbingSystemComponent>(TEXT("GrabbingSystemComponent"));
+
+	PhysicsHandleComponent = CreateDefaultSubobject<UPhysicsHandleComponent>(TEXT("PhysicsHandleComponent"));
 }
 
 void APanaceaCharacter::BeginPlay()
@@ -72,6 +81,9 @@ void APanaceaCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 
 		//Reset Sequence
 		EnhancedInputComponent->BindAction(RestartAction, ETriggerEvent::Triggered, this, &APanaceaCharacter::OnRestart);
+		
+		//Pause action
+		EnhancedInputComponent->BindAction(PauseAction, ETriggerEvent::Triggered, this, &APanaceaCharacter::Pause);
 	}
 	else
 	{
@@ -111,4 +123,10 @@ void APanaceaCharacter::OnRestart()
 {
 	UGameplayStatics::OpenLevel(this, FName(*GetWorld()->GetName()), false);
 }
+
+void APanaceaCharacter::Pause()
+{
+	UE_LOG(LogTemp, Log, TEXT("Pause works?"));
+}
+
 

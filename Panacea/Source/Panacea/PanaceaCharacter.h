@@ -2,6 +2,7 @@
 
 #pragma once
 
+
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Logging/LogMacros.h"
@@ -12,6 +13,9 @@ class USkeletalMeshComponent;
 class UCameraComponent;
 class UInputAction;
 class UInputMappingContext;
+class UMouseDragObjectsComponent;
+class UGrabbingSystemComponent;
+class UPhysicsHandleComponent;
 struct FInputActionValue;
 
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
@@ -28,6 +32,18 @@ class APanaceaCharacter : public ACharacter
 	/** First person camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	UCameraComponent* FirstPersonCameraComponent;
+	
+	/** Component for Draging objects by mouse */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	UMouseDragObjectsComponent* MouseDragObjectsComponent;
+
+	/** Component for grabbing objects */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	UGrabbingSystemComponent* GrabbingSystemComponent;
+
+	/** Component for physic handling*/
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	UPhysicsHandleComponent* PhysicsHandleComponent;
 
 	/** MappingContext */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
@@ -36,15 +52,7 @@ class APanaceaCharacter : public ACharacter
 	/** Move Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
 	UInputAction* MoveAction;
-	
-public:
-	APanaceaCharacter();
 
-protected:
-	virtual void BeginPlay();
-
-public:
-		
 	/** Look Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* LookAction;
@@ -52,6 +60,16 @@ public:
 	/** Restart Input Action */
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	UInputAction* RestartAction;
+
+	/** Pause Input Action */
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	UInputAction* PauseAction;
+	
+public:
+	APanaceaCharacter();
+
+protected:
+	virtual void BeginPlay();
 
 protected:
 	/** Called for movement input */
@@ -62,6 +80,9 @@ protected:
 
 	/** Called When Player Restarts Game */
 	void OnRestart();
+	
+	/** Called When Player pauses Game */
+	void Pause();
 
 protected:
 	// APawn interface
@@ -73,6 +94,7 @@ public:
 	USkeletalMeshComponent* GetMesh1P() const { return Mesh1P; }
 	/** Returns FirstPersonCameraComponent subobject **/
 	UCameraComponent* GetFirstPersonCameraComponent() const { return FirstPersonCameraComponent; }
-
+	/** Returns DefaultMappingContext subobject **/
+	UInputMappingContext* GetDefaultMappingContext() const { return DefaultMappingContext; }
 };
 
