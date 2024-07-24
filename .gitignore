@@ -1,1 +1,3 @@
 *.log
+*.spp
+*.painter_lock
