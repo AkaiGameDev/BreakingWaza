@@ -25,6 +25,8 @@ protected:
 	UPROPERTY(VisibleAnywhere)
 	USphereComponent* CollisionComponent;
 
+private:
+	void OnIngredientAdded(AActor* Ingredient);
 
 public:	
 	// Called every frame

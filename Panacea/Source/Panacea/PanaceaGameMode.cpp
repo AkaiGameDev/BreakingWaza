@@ -11,4 +11,18 @@ APanaceaGameMode::APanaceaGameMode()
 	static ConstructorHelpers::FClassFinder<APawn> PlayerPawnClassFinder(TEXT("/Game/FirstPerson/Blueprints/BP_FirstPersonCharacter"));
 	DefaultPawnClass = PlayerPawnClassFinder.Class;
 
+	OnIngredientAdded.AddDynamic(this, &APanaceaGameMode::RecordIngredient);
+
+}
+
+void APanaceaGameMode::RecordIngredient(const FString& IngredientName)
+{
+	IngredientNames.Add(IngredientName);
+	UE_LOG(LogTemp, Warning, TEXT("Ingredient Added: %s"), *IngredientName);
+
+
+	for (const FString& String : IngredientNames)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("%s"), *String);
+	}
 }

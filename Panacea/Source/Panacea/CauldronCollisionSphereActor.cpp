@@ -3,7 +3,8 @@
 
 #include "CauldronCollisionSphereActor.h"
 #include "Engine/Engine.h"
-
+#include "PanaceaGameMode.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 ACauldronCollisionSphereActor::ACauldronCollisionSphereActor()
@@ -49,10 +50,22 @@ void ACauldronCollisionSphereActor::OnOverlapBegin(UPrimitiveComponent* Overlapp
 	if (OtherActorTag == "Ingredient")
 	{
 		FTimerHandle TimerHandle;
-		GetWorldTimerManager().SetTimer(TimerHandle, [OtherActor]() {
-			OtherActor->Destroy();
-		}, 1.0f, false);
+
+		GetWorldTimerManager().SetTimer(TimerHandle, [this, OtherActor]()
+			{
+				OnIngredientAdded(OtherActor);
+			}, 1.0f, false);
 	}
 
 }
 
+void ACauldronCollisionSphereActor::OnIngredientAdded(AActor* Ingredient)
+{
+	APanaceaGameMode* GameMode = Cast<APanaceaGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+	if (GameMode)
+	{
+		GameMode->OnIngredientAdded.Broadcast(Ingredient->GetName());
+	}
+
+	Ingredient->Destroy();
+}
