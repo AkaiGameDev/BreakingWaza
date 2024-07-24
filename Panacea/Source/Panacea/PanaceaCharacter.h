@@ -6,7 +6,9 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Logging/LogMacros.h"
+#include "IInteractable.h"
 #include "PanaceaCharacter.generated.h"
+
 
 class UInputComponent;
 class USkeletalMeshComponent;
@@ -64,6 +66,10 @@ class APanaceaCharacter : public ACharacter
 	/** Pause Input Action */
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	UInputAction* PauseAction;
+
+	/** Interact Input Action */
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	UInputAction* InteractAction;
 	
 public:
 	APanaceaCharacter();
@@ -83,6 +89,8 @@ protected:
 	
 	/** Called When Player pauses Game */
 	void Pause();
+
+	void Interact(const FInputActionValue& Value);
 
 protected:
 	// APawn interface
