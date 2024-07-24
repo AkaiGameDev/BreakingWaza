@@ -51,12 +51,12 @@ SourceArt/**/*.tga
 #################################
 # Unreal Engine Generated Files #
 #################################
-/Build
-/Builds
-/Binaries
-/DerivedDataCache
-/Intermediate
-/Saved
+*/Build
+*/Builds
+*/Binaries
+*/DerivedDataCache
+*/Intermediate
+*/Saved
 
 # Whitelist PakBlacklist-<BuildConfiguration>.txt files
 !Build/*/
