@@ -46,7 +46,7 @@ void ACauldronCollisionSphereActor::OnOverlapBegin(UPrimitiveComponent* Overlapp
 	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, TEXT("Something collided with the cauldron!"));
 
 	FString OtherActorTag = OtherActor->Tags[0].ToString();
-	if (OtherActorTag == "ingredient")
+	if (OtherActorTag == "Ingredient")
 	{
 		FTimerHandle TimerHandle;
 		GetWorldTimerManager().SetTimer(TimerHandle, [OtherActor]() {

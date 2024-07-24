@@ -8,7 +8,7 @@
 
 // This class does not need to be modified.
 UINTERFACE(MinimalAPI)
-class UIInteractable : public UInterface
+class UInteractable : public UInterface
 {
 	GENERATED_BODY()
 };
@@ -16,7 +16,7 @@ class UIInteractable : public UInterface
 /**
  * 
  */
-class PANACEA_API IIInteractable
+class PANACEA_API IInteractable
 {
 	GENERATED_BODY()
 

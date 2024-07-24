@@ -84,6 +84,11 @@ void APanaceaCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 		
 		//Pause action
 		EnhancedInputComponent->BindAction(PauseAction, ETriggerEvent::Triggered, this, &APanaceaCharacter::Pause);
+
+		//Interact action
+		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Triggered, this, &APanaceaCharacter::Interact);
+
+
 	}
 	else
 	{
@@ -127,6 +132,48 @@ void APanaceaCharacter::OnRestart()
 void APanaceaCharacter::Pause()
 {
 	UE_LOG(LogTemp, Log, TEXT("Pause works?"));
+}
+
+void APanaceaCharacter::Interact(const FInputActionValue& Value)
+{
+
+	FVector Start;
+	FRotator Rotation;
+	FVector End;
+	FHitResult HitResult;
+
+	APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
+	if (PlayerController)
+	{
+		PlayerController->GetPlayerViewPoint(Start, Rotation);
+		End = Start + (Rotation.Vector() * 500.0f);
+		FCollisionQueryParams CollisionParams;
+		CollisionParams.AddIgnoredActor(this);
+
+
+		if (GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_Visibility, CollisionParams))
+		{
+			AActor* HitActor = HitResult.GetActor();
+			if (HitActor)
+			{
+				IInteractable* Interactable = Cast<IInteractable>(HitActor);
+				if (Interactable)
+				{
+					Interactable->Interact();
+					GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, TEXT("Interacted!"));
+				}
+				else
+				{
+					GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, TEXT("Hit Actor does not implement IInteractable!"));
+				}
+			}
+		}
+		else
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, TEXT("No Interactable Object Found!"));
+		}
+	}
+
 }
 
 
