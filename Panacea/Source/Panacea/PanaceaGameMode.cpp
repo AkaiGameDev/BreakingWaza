@@ -3,6 +3,8 @@
 #include "PanaceaGameMode.h"
 #include "PanaceaCharacter.h"
 #include "UObject/ConstructorHelpers.h"
+#include "Blueprint/UserWidget.h"
+#include "Kismet/GameplayStatics.h"
 
 APanaceaGameMode::APanaceaGameMode()
 	: Super()
@@ -18,11 +20,24 @@ APanaceaGameMode::APanaceaGameMode()
 void APanaceaGameMode::RecordIngredient(const FString& IngredientName)
 {
 	IngredientNames.Add(IngredientName);
+
 	UE_LOG(LogTemp, Warning, TEXT("Ingredient Added: %s"), *IngredientName);
 
+	CheckGoodEnding();
+}
 
-	for (const FString& String : IngredientNames)
+void APanaceaGameMode::CheckGoodEnding()
+{
+	if (IngredientNames.Num() > 1)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("%s"), *String);
+		if (GoodEndingWidgetClass)
+		{
+			// Create the widget and add it to the viewport
+			GoodEndingWidgetInstance = CreateWidget<UUserWidget>(GetWorld(), GoodEndingWidgetClass);
+			if (GoodEndingWidgetInstance)
+			{
+				GoodEndingWidgetInstance->AddToViewport();
+			}
+		}
 	}
 }

@@ -8,7 +8,6 @@
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnIngredientAdded, const FString&, IngredientName);
 
-
 UCLASS(minimalapi)
 class APanaceaGameMode : public AGameModeBase
 {
@@ -20,11 +19,21 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = "Ingredients")
 	FOnIngredientAdded OnIngredientAdded;
 
+	// The widget class to use
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UI")
+	TSubclassOf<UUserWidget> GoodEndingWidgetClass;
+
+	// The widget instance
+	UPROPERTY()
+	UUserWidget* GoodEndingWidgetInstance;
+
 	// Function to record the ingredient
 	UFUNCTION()
 	void RecordIngredient(const FString& IngredientName);
 
 private:
+	void CheckGoodEnding();
+	
 	TArray<FString> IngredientNames;
 };
 
