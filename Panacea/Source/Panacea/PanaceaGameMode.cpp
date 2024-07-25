@@ -14,6 +14,7 @@ APanaceaGameMode::APanaceaGameMode()
 	DefaultPawnClass = PlayerPawnClassFinder.Class;
 
 	OnIngredientAdded.AddDynamic(this, &APanaceaGameMode::RecordIngredient);
+	OnBadEnding.AddDynamic(this, &APanaceaGameMode::OnBadEndingSequence);
 
 }
 
@@ -23,7 +24,25 @@ void APanaceaGameMode::RecordIngredient(const FString& IngredientName)
 
 	UE_LOG(LogTemp, Warning, TEXT("Ingredient Added: %s"), *IngredientName);
 
-	CheckGoodEnding();
+	if (CheckBadEnding(IngredientName))
+	{
+		OnBadEnding.Broadcast();
+	}
+	else
+		CheckGoodEnding();
+}
+
+void APanaceaGameMode::OnBadEndingSequence()
+{
+	if (BadEndingWidgetClass)
+	{
+		// Create the widget and add it to the viewport
+		BadEndingWidgetInstance = CreateWidget<UUserWidget>(GetWorld(), BadEndingWidgetClass);
+		if (BadEndingWidgetInstance)
+		{
+			BadEndingWidgetInstance->AddToViewport();
+		}
+	}
 }
 
 void APanaceaGameMode::CheckGoodEnding()
@@ -40,4 +59,12 @@ void APanaceaGameMode::CheckGoodEnding()
 			}
 		}
 	}
+}
+
+bool APanaceaGameMode::CheckBadEnding(const FString& IngredientName)
+{
+	if (IngredientName == "WrongIngredient")
+		return true;
+	else
+		return false;
 }

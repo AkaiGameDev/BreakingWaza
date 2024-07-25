@@ -69,7 +69,7 @@ void ACauldronCollisionSphereActor::OnIngredientAdded(AActor* Ingredient)
 	APanaceaGameMode* GameMode = Cast<APanaceaGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 	if (GameMode)
 	{
-		GameMode->OnIngredientAdded.Broadcast(Ingredient->GetName());
+		GameMode->OnIngredientAdded.Broadcast(Ingredient->GetActorLabel());
 	}
 
 	Ingredient->Destroy();
