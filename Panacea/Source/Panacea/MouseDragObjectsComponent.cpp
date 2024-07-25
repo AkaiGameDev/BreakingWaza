@@ -85,24 +85,14 @@ void UMouseDragObjectsComponent::TickComponent(float DeltaTime, ELevelTick TickT
 
 	PhysicsHandle->SetTargetLocation(TargetLocation);
 
-	/*APlayerCameraManager* CameraManager = PlayerController->PlayerCameraManager;
-	if (!CameraManager)
-	{
-		return;
-	}
-
-	FVector Position;
-	FVector Direction;
-
-	PlayerController->DeprojectMousePositionToWorld(Position, Direction);*/
-
 	UE_LOG(LogTemp, Log, TEXT("Position: X=%f, Y=%f, Z=%f"), WorldPosition.X, WorldPosition.Y, WorldPosition.Z);
-
 }
 
 
 void UMouseDragObjectsComponent::SwitchGrabMode()
 {
+	ReleaseComponent();
+
 	bIsGrabMode = !bIsGrabMode;
 	if (bIsGrabMode)
 	{

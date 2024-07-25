@@ -46,6 +46,11 @@ void ACauldronCollisionSphereActor::OnOverlapBegin(UPrimitiveComponent* Overlapp
 {
 	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, TEXT("Something collided with the cauldron!"));
 
+	if (OtherActor->Tags.Num() == 0)
+	{
+		return;
+	}
+
 	FString OtherActorTag = OtherActor->Tags[0].ToString();
 	if (OtherActorTag == "Ingredient")
 	{
