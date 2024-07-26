@@ -3,6 +3,8 @@
 
 #include "TestInteractableActor.h"
 
+#include "Kismet/GameplayStatics.h"
+
 // Sets default values
 ATestInteractableActor::ATestInteractableActor()
 {
@@ -27,6 +29,8 @@ void ATestInteractableActor::Tick(float DeltaTime)
 
 void ATestInteractableActor::Interact()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, TEXT("Something interacted with us!"));
+
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("Loading Level: ") + LevelName.ToString());
+	UGameplayStatics::OpenLevel(GetWorld(), LevelName);
 }
 

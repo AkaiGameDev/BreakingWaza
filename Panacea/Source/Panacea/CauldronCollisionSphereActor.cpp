@@ -39,6 +39,11 @@ void ACauldronCollisionSphereActor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	//print position
+
+	//FString Position = GetActorLocation().ToString();
+	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, Position);
+
 }
 
 void ACauldronCollisionSphereActor::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
@@ -64,6 +69,7 @@ void ACauldronCollisionSphereActor::OnOverlapBegin(UPrimitiveComponent* Overlapp
 
 }
 
+
 void ACauldronCollisionSphereActor::OnIngredientAdded(AActor* Ingredient)
 {
 	APanaceaGameMode* GameMode = Cast<APanaceaGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
@@ -74,3 +80,4 @@ void ACauldronCollisionSphereActor::OnIngredientAdded(AActor* Ingredient)
 
 	Ingredient->Destroy();
 }
+
