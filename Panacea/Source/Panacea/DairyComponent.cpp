@@ -38,34 +38,81 @@ void UDairyComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActor
 
 void UDairyComponent::Dairy()
 {
-    auto HitResult = GetFirstPhysicsBodyInReach();
-    auto ActorHit = HitResult.GetActor();
+    UE_LOG(LogTemp, Warning, TEXT("Dairy function called"));
 
-    // Only proceed if the actor has the "Ingredient" tag
-    if (ActorHit && ActorHit->ActorHasTag("Dairy"))
+    bool bIsGamePaused = UGameplayStatics::IsGamePaused(GetWorld());
+    UE_LOG(LogTemp, Warning, TEXT("Is Game Paused: %s"), bIsGamePaused ? TEXT("True") : TEXT("False"));
+
+    if (bIsGamePaused)
     {
-        if (!PauseMenuWidgetClass) { return; }
-
-        if (PauseMenuWidget && PauseMenuWidget->IsInViewport())
+        // Unpause the game if it's currently paused
+        if (PauseMenuWidget)
         {
-            // If the widget is already displayed, remove it from the viewport
             PauseMenuWidget->RemoveFromViewport();
             PauseMenuWidget = nullptr;
+            UE_LOG(LogTemp, Warning, TEXT("Pause Menu Removed"));
 
-            // Resume game
-            UGameplayStatics::SetGamePaused(GetWorld(), false);
+            APlayerController* PlayerController = UGameplayStatics::GetPlayerController(this, 0);
+            if (PlayerController)
+            {
+                FInputModeGameOnly InputMode;
+                PlayerController->SetInputMode(InputMode);
+                PlayerController->bShowMouseCursor = false;
+            }
+        }
+
+        UGameplayStatics::SetGamePaused(GetWorld(), false);
+        UE_LOG(LogTemp, Warning, TEXT("Game Unpaused"));
+    }
+    else
+    {
+        auto HitResult = GetFirstPhysicsBodyInReach();
+        auto ActorHit = HitResult.GetActor();
+
+        // Only proceed if the actor has the "Ingredient" tag
+        if (ActorHit && ActorHit->ActorHasTag("Dairy"))
+        {
+            UE_LOG(LogTemp, Warning, TEXT("Ingredient Detected: %s"), *ActorHit->GetName());
+
+            if (!PauseMenuWidgetClass)
+            {
+                UE_LOG(LogTemp, Error, TEXT("PauseMenuWidgetClass is not set"));
+                return;
+            }
+
+            // Get the player controller
+            APlayerController* PlayerController = UGameplayStatics::GetPlayerController(this, 0);
+            if (!PlayerController)
+            {
+                UE_LOG(LogTemp, Error, TEXT("PlayerController is not found."));
+                return;
+            }
+
+            // Create the pause menu widget
+            PauseMenuWidget = CreateWidget<UUserWidget>(PlayerController, PauseMenuWidgetClass);
+            if (!PauseMenuWidget)
+            {
+                UE_LOG(LogTemp, Error, TEXT("PauseMenuWidget could not be created."));
+                return;
+            }
+
+            // Add the widget to the viewport
+            PauseMenuWidget->AddToViewport();
+
+            // Set the input mode to UI only and show the mouse cursor
+            FInputModeUIOnly InputMode;
+            InputMode.SetWidgetToFocus(PauseMenuWidget->TakeWidget());
+            InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
+            PlayerController->SetInputMode(InputMode);
+            PlayerController->bShowMouseCursor = true;
+
+            // Pause the game
+            UGameplayStatics::SetGamePaused(this, true);
+            UE_LOG(LogTemp, Warning, TEXT("Game Paused and Pause Menu Displayed"));
         }
         else
         {
-            // Create and display the pause menu widget
-            PauseMenuWidget = CreateWidget<UUserWidget>(GetWorld(), PauseMenuWidgetClass);
-            if (PauseMenuWidget)
-            {
-                PauseMenuWidget->AddToViewport();
-
-                // Pause game
-                UGameplayStatics::SetGamePaused(GetWorld(), true);
-            }
+            UE_LOG(LogTemp, Warning, TEXT("No valid actor with 'Ingredient' tag in reach"));
         }
     }
 }
@@ -85,6 +132,7 @@ void UDairyComponent::SetupInputComponent()
     if (InputComponent)
     {
         InputComponent->BindAction(DairyAction, ETriggerEvent::Triggered, this, &UDairyComponent::Dairy);
+        UE_LOG(LogTemp, Warning, TEXT("Input component and action bound"));
     }
     else
     {
