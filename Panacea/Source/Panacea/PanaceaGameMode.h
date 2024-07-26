@@ -48,6 +48,9 @@ public:
 	UFUNCTION()
 	void OnBadEndingSequence();
 
+	UFUNCTION(BlueprintCallable)
+		void BroadcastBadEndingEvent();
+
 private:
 
 	void CheckGoodEnding();
