@@ -1,7 +1,7 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "PanaceaCharacter.h"
-#include "PanaceaProjectile.h"
+#include "DrawDebugHelpers.h"
 #include "Animation/AnimInstance.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
@@ -150,12 +150,19 @@ void APanaceaCharacter::Interact(const FInputActionValue& Value)
 		FCollisionQueryParams CollisionParams;
 		CollisionParams.AddIgnoredActor(this);
 
+		// Draw the debug line from Start to End
+		DrawDebugLine(GetWorld(), Start, End, FColor::Green, false, 1, 0, 1);
+
+
 
 		if (GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_Visibility, CollisionParams))
 		{
 			AActor* HitActor = HitResult.GetActor();
 			if (HitActor)
 			{
+				// Draw a debug sphere at the hit location
+				DrawDebugSphere(GetWorld(), HitResult.Location, 10.0f, 12, FColor::Red, false, 1);
+
 				IInteractable* Interactable = Cast<IInteractable>(HitActor);
 				if (Interactable)
 				{
