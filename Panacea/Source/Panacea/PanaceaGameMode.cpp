@@ -45,6 +45,11 @@ void APanaceaGameMode::OnBadEndingSequence()
 	}
 }
 
+void APanaceaGameMode::BroadcastBadEndingEvent()
+{
+	OnBadEnding.Broadcast();
+}
+
 void APanaceaGameMode::CheckGoodEnding()
 {
 	if (IngredientNames.Num() > 1)
