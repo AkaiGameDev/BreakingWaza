@@ -3,14 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "IInteractable.h"
+"
 #include "GameFramework/Actor.h"
 #include "Components/SphereComponent.h"
 #include "CauldronCollisionSphereActor.generated.h"
 
 
 UCLASS()
-class PANACEA_API ACauldronCollisionSphereActor : public AActor,public IInteractable
+class PANACEA_API ACauldronCollisionSphereActor : public AActor
 {
 	GENERATED_BODY()
 	
@@ -39,6 +39,6 @@ public:
 		class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 
-	virtual void Interact() override;
+	
 
 };
