@@ -64,4 +64,7 @@ private:
 	bool bIsGrabMode;
 	float OriginalDistanceToComponent;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
+	TSubclassOf<UUserWidget> CrosshairWidgetClass;
+
 };
