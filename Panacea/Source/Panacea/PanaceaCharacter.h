@@ -70,6 +70,9 @@ class APanaceaCharacter : public ACharacter
 	/** Interact Input Action */
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	UInputAction* InteractAction;
+
+
+
 	
 public:
 	APanaceaCharacter();
@@ -92,7 +95,10 @@ protected:
 
 	void Interact(const FInputActionValue& Value);
 
-protected:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
+	TSubclassOf<UUserWidget> CrosshairWidgetClass;
+
+
 	// APawn interface
 	virtual void SetupPlayerInputComponent(UInputComponent* InputComponent) override;
 	// End of APawn interface

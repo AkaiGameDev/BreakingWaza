@@ -11,7 +11,7 @@
 #include "InputActionValue.h"
 #include "Engine/LocalPlayer.h"
 #include "Kismet/GameplayStatics.h"
-
+#include "Blueprint/UserWidget.h"
 #include "GrabbingSystemComponent.h"
 #include "MouseDragObjectsComponent.h"
 
@@ -62,6 +62,16 @@ void APanaceaCharacter::BeginPlay()
 			Subsystem->AddMappingContext(DefaultMappingContext, 0);
 		}
 	}
+
+	if (CrosshairWidgetClass) // Ensure the widget class is set
+		{
+		UUserWidget* CrosshairWidget = CreateWidget<UUserWidget>(GetWorld(), CrosshairWidgetClass);
+
+		if (CrosshairWidget)
+		{
+			CrosshairWidget->AddToViewport(); // Adds the widget to the screen
+		}
+		}
 
 }
 
