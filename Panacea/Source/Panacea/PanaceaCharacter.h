@@ -77,6 +77,8 @@ class APanaceaCharacter : public ACharacter
 public:
 	APanaceaCharacter();
 
+
+
 protected:
 	virtual void BeginPlay();
 
@@ -98,6 +100,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
 	TSubclassOf<UUserWidget> CrosshairWidgetClass;
 
+	UUserWidget* CrosshairWidget;
 
 	// APawn interface
 	virtual void SetupPlayerInputComponent(UInputComponent* InputComponent) override;
@@ -110,5 +113,7 @@ public:
 	UCameraComponent* GetFirstPersonCameraComponent() const { return FirstPersonCameraComponent; }
 	/** Returns DefaultMappingContext subobject **/
 	UInputMappingContext* GetDefaultMappingContext() const { return DefaultMappingContext; }
+
+	UUserWidget* GetCrosshairWidget() const;
 };
 

@@ -70,4 +70,7 @@ private:
 	// How far ahead of the player can we reach in cm
 	UPROPERTY(EditAnywhere)
 	float Reach = 200.f;
+
+	// Crosshair
+	UUserWidget* Crosshair;
 };

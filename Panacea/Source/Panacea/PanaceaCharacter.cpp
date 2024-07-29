@@ -22,10 +22,9 @@ DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
 APanaceaCharacter::APanaceaCharacter()
 {
-
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(55.f, 96.0f);
-		
+
 	// Create a CameraComponent	
 	FirstPersonCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("FirstPersonCamera"));
 	FirstPersonCameraComponent->SetupAttachment(GetCapsuleComponent());
@@ -51,28 +50,34 @@ APanaceaCharacter::APanaceaCharacter()
 
 void APanaceaCharacter::BeginPlay()
 {
+	// Widget needs to be created before calling the base class BeginPlay because if the widget is not created, the widget will be null
+	// in the components BeginPlay methods and will cause a crash when trying to access the widget. So you know
+	// before changing something here.
+	if (CrosshairWidgetClass) // Ensure the widget class is set
+	{
+		CrosshairWidget = CreateWidget<UUserWidget>(GetWorld(), CrosshairWidgetClass);
+
+		if (CrosshairWidget)
+		{
+			CrosshairWidget->AddToViewport(); // Adds the widget to the screen
+
+			//log that the widget was created
+			UE_LOG(LogTemp, Warning, TEXT("Crosshair widget created"));
+		}
+	}
+
 	// Call the base class  
 	Super::BeginPlay();
 
 	// Add Input Mapping Context
 	if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
 	{
-		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
+		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<
+			UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
 		{
 			Subsystem->AddMappingContext(DefaultMappingContext, 0);
 		}
 	}
-
-	if (CrosshairWidgetClass) // Ensure the widget class is set
-		{
-		UUserWidget* CrosshairWidget = CreateWidget<UUserWidget>(GetWorld(), CrosshairWidgetClass);
-
-		if (CrosshairWidget)
-		{
-			CrosshairWidget->AddToViewport(); // Adds the widget to the screen
-		}
-		}
-
 }
 
 //////////////////////////////////////////////////////////////////////////// Input
@@ -82,7 +87,6 @@ void APanaceaCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	// Set up action bindings
 	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent))
 	{
-
 		// Moving
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &APanaceaCharacter::Move);
 
@@ -90,20 +94,29 @@ void APanaceaCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &APanaceaCharacter::Look);
 
 		//Reset Sequence
-		EnhancedInputComponent->BindAction(RestartAction, ETriggerEvent::Triggered, this, &APanaceaCharacter::OnRestart);
-		
+		EnhancedInputComponent->BindAction(RestartAction, ETriggerEvent::Triggered, this,
+		                                   &APanaceaCharacter::OnRestart);
+
 		//Pause action
 		EnhancedInputComponent->BindAction(PauseAction, ETriggerEvent::Triggered, this, &APanaceaCharacter::Pause);
 
 		//Interact action
-		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Triggered, this, &APanaceaCharacter::Interact);
-
-
+		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Triggered, this,
+		                                   &APanaceaCharacter::Interact);
 	}
 	else
 	{
-		UE_LOG(LogTemplateCharacter, Error, TEXT("'%s' Failed to find an Enhanced Input Component! This template is built to use the Enhanced Input system. If you intend to use the legacy system, then you will need to update this C++ file."), *GetNameSafe(this));
+		UE_LOG(LogTemplateCharacter, Error,
+		       TEXT(
+			       "'%s' Failed to find an Enhanced Input Component! This template is built to use the Enhanced Input system. If you intend to use the legacy system, then you will need to update this C++ file."
+		       ), *GetNameSafe(this));
 	}
+}
+
+UUserWidget* APanaceaCharacter::GetCrosshairWidget() const
+{
+	UE_LOG(LogTemp, Warning, TEXT("Geting Crosshair Widget"));
+	return CrosshairWidget;
 }
 
 
@@ -146,7 +159,6 @@ void APanaceaCharacter::Pause()
 
 void APanaceaCharacter::Interact(const FInputActionValue& Value)
 {
-
 	FVector Start;
 	FRotator Rotation;
 	FVector End;
@@ -162,7 +174,6 @@ void APanaceaCharacter::Interact(const FInputActionValue& Value)
 
 		// Draw the debug line from Start to End
 		DrawDebugLine(GetWorld(), Start, End, FColor::Green, false, 1, 0, 1);
-
 
 
 		if (GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_Visibility, CollisionParams))
@@ -181,7 +192,8 @@ void APanaceaCharacter::Interact(const FInputActionValue& Value)
 				}
 				else
 				{
-					GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, TEXT("Hit Actor does not implement IInteractable!"));
+					GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow,
+					                                 TEXT("Hit Actor does not implement IInteractable!"));
 				}
 			}
 		}
@@ -190,7 +202,4 @@ void APanaceaCharacter::Interact(const FInputActionValue& Value)
 			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, TEXT("No Interactable Object Found!"));
 		}
 	}
-
 }
-
-
