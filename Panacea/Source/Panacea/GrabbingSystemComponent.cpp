@@ -19,6 +19,9 @@ void UGrabbingSystemComponent::BeginPlay()
 
     FindPhysicsHandle();
     SetupInputComponent();
+
+
+
 }
 
 // Called every frame
@@ -129,3 +132,4 @@ FVector UGrabbingSystemComponent::GetReachLineEnd()
     // Draw a line from the player showing the reach
     return PlayerViewPointLocation + PlayerViewPointRotation.Vector() * Reach;
 }
+

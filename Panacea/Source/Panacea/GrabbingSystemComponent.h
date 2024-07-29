@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "PhysicsEngine/PhysicsHandleComponent.h"
+#include "Blueprint/UserWidget.h"
 #include "GrabbingSystemComponent.generated.h"
 
 class UInputAction;
@@ -13,20 +14,25 @@ class PANACEA_API UGrabbingSystemComponent : public UActorComponent
 	GENERATED_BODY()
 
 public:
-
 	UGrabbingSystemComponent();
 
 	/** Grab Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* GrabAction;
 
-protected:
 
+
+
+
+protected:
 	virtual void BeginPlay() override;
 
-public:
 
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+
+
+public:
+	virtual void TickComponent(float DeltaTime, ELevelTick TickType,
+	                           FActorComponentTickFunction* ThisTickFunction) override;
 
 private:
 	// Physics Handle
@@ -59,7 +65,6 @@ private:
 
 	// Returns current end of reach line
 	FVector GetReachLineEnd();
-
 
 
 	// How far ahead of the player can we reach in cm
