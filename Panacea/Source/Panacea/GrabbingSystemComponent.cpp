@@ -5,6 +5,7 @@
 #include "GameFramework/PlayerController.h"
 #include "Components/InputComponent.h"
 #include <EnhancedInputComponent.h>
+#include "PhysicsEngine/PhysicsHandleComponent.h"
 
 // Sets default values for this component's properties
 UGrabbingSystemComponent::UGrabbingSystemComponent()
@@ -42,6 +43,19 @@ void UGrabbingSystemComponent::Grab()
     {
         // If we're currently grabbing something, release it
         UE_LOG(LogTemp, Warning, TEXT("Grab released"));
+
+        // Disable CCD
+        PhysicsHandle->GrabbedComponent->SetAllPhysicsLinearVelocity(FVector::ZeroVector);
+        PhysicsHandle->GrabbedComponent->SetAllPhysicsAngularVelocityInDegrees(FVector::ZeroVector);
+        PhysicsHandle->GrabbedComponent->SetEnableGravity(true);
+        PhysicsHandle->GrabbedComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+
+        UPrimitiveComponent* GrabbedComponent = PhysicsHandle->GrabbedComponent;
+        if (GrabbedComponent)
+        {
+            GrabbedComponent->SetUseCCD(false);
+        }
+
         PhysicsHandle->ReleaseComponent();
     }
     else
@@ -60,10 +74,15 @@ void UGrabbingSystemComponent::Grab()
                 NAME_None, // no bones needed
                 ComponentToGrab->GetOwner()->GetActorLocation()
             );
+
+            // Enable CCD
+            if (ComponentToGrab)
+            {
+                ComponentToGrab->SetUseCCD(true);
+            }
         }
     }
 }
-
 
 void UGrabbingSystemComponent::FindPhysicsHandle()
 {
