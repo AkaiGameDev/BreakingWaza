@@ -44,6 +44,7 @@ public:
 	// Change Grab Mode Input Action
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* GrabModeAction;
+
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
@@ -63,5 +64,9 @@ private:
 	UPrimitiveComponent* GrabbedComponent;
 	bool bIsGrabMode;
 	float OriginalDistanceToComponent;
+
+	// Crosshair
+	UUserWidget* Crosshair;
+	
 
 };
