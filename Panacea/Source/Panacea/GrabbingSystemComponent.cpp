@@ -30,14 +30,6 @@ void UGrabbingSystemComponent::BeginPlay()
         if (Character)
         {
             Crosshair = Character->GetCrosshairWidget();
-            if (Crosshair)
-            {
-                UE_LOG(LogTemp, Warning, TEXT("Crosshair widget is found"));
-            }
-            else
-            {
-                UE_LOG(LogTemp, Warning, TEXT("Crosshair widget is not found"));
-            }
         }
         else
         {

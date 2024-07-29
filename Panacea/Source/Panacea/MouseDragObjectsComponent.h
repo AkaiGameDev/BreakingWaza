@@ -65,6 +65,8 @@ private:
 	bool bIsGrabMode;
 	float OriginalDistanceToComponent;
 
+	// Crosshair
+	UUserWidget* Crosshair;
 	
 
 };
