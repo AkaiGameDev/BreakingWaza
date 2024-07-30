@@ -163,34 +163,5 @@ void APanaceaCharacter::Pause()
 
 void APanaceaCharacter::Interact(const FInputActionValue& Value)
 {
-
-	//instead of this call the interact method of the interactable component
 	InteractiveComponent->Interact(Value);
-
-	/*FVector Start;
-	FRotator Rotation;
-	FVector End;
-	FHitResult HitResult;
-
-	APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
-	if (PlayerController)
-	{
-		PlayerController->GetPlayerViewPoint(Start, Rotation);
-		End = Start + (Rotation.Vector() * 500.0f);
-		FCollisionQueryParams CollisionParams;
-		CollisionParams.AddIgnoredActor(this);
-
-		if (GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_Visibility, CollisionParams))
-		{
-			AActor* HitActor = HitResult.GetActor();
-			if (HitActor)
-			{
-				IInteractable* Interactable = Cast<IInteractable>(HitActor);
-				if (Interactable)
-				{
-					Interactable->Interact();
-				}
-			}
-		}
-	} */
 }
