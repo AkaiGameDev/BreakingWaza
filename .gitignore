@@ -75,3 +75,5 @@ Build/*/**
 
 # Cache files for the editor to use
 DerivedDataCache/*
+*.aup3-shm
+*.aup3-wal
