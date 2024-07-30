@@ -29,8 +29,6 @@ public:
 	virtual void OnInteractableInRange() override;
 	virtual void OnInteractableOutOfRange() override;
 
-	///level name editable in engine
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Level")
-	FName LevelName;
+
 
 };

@@ -29,9 +29,8 @@ void AIngridient::Tick(float DeltaTime)
 
 void AIngridient::Interact()
 {
-
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("Loading Level: ") + LevelName.ToString());
-	UGameplayStatics::OpenLevel(GetWorld(), LevelName);
+	FString ActorName = GetName();
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("Interacted With: ") + ActorName);
 }
 
 void AIngridient::OnInteractableInRange()
