@@ -5,10 +5,14 @@
 			"guid": "00000000000000000000000000000000",
 			"description": "Default Uncontrolled Changelist",
 			"files": [
-				"/Users/lily/Documents/GitHub/BreakingWaza/Panacea/Content/__ExternalActors__/FirstPerson/Maps/FirstPersonMap/4/EQ/NL768FB9HYMFX21J10T9MK.uasset",
-				"/Users/lily/Documents/GitHub/BreakingWaza/Panacea/Content/Art/3D/Models/Book_1/Material_002.uasset",
-				"/Users/lily/Documents/GitHub/BreakingWaza/Panacea/Content/Art/3D/Models/Book_1/Book_2.uasset",
-				"/Users/lily/Documents/GitHub/BreakingWaza/Panacea/Content/Art/3D/Models/Book_1/diffuse_book_2.uasset"
+				"/Users/lily/Documents/GitHub/BreakingWaza/Panacea/Content/Art/3D/Models/CuttingBoard/board.uasset",
+				"/Users/lily/Documents/GitHub/BreakingWaza/Panacea/Content/__ExternalActors__/FirstPerson/Maps/FirstPersonMap/7/L7/DN45F47XPT61IS3TUEFCSU.uasset",
+				"/Users/lily/Documents/GitHub/BreakingWaza/Panacea/Content/__ExternalActors__/FirstPerson/Maps/FirstPersonMap/6/YP/0XEBRN8KN10JEQ8S1ARVSC.uasset",
+				"/Users/lily/Documents/GitHub/BreakingWaza/Panacea/Content/Art/3D/Textures/CuttingBoard/Cutting_board_board_BaseColor.uasset",
+				"/Users/lily/Documents/GitHub/BreakingWaza/Panacea/Content/Art/3D/Textures/CuttingBoard/Cutting_board_board_Normal.uasset",
+				"/Users/lily/Documents/GitHub/BreakingWaza/Panacea/Content/Art/3D/Textures/CuttingBoard/Cutting_board_board_OcclusionRoughnessMetallic.uasset",
+				"/Users/lily/Documents/GitHub/BreakingWaza/Panacea/Content/Art/3D/Models/CuttingBoard/Cutting_board_fixed.uasset",
+				"/Users/lily/Documents/GitHub/BreakingWaza/Panacea/Content/Art/3D/Materials/Cutting_Board/CuttingBoardMaterial.uasset"
 			]
 		}
 	]
