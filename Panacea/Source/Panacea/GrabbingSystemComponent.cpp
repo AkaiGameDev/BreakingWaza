@@ -3,6 +3,7 @@
 #include "Engine/World.h"
 #include "DrawDebugHelpers.h"
 #include "GameFramework/PlayerController.h"
+#include "PanaceaCharacter.h"
 #include "Components/InputComponent.h"
 #include <EnhancedInputComponent.h>
 #include "PhysicsEngine/PhysicsHandleComponent.h"
@@ -20,8 +21,27 @@ void UGrabbingSystemComponent::BeginPlay()
 
     FindPhysicsHandle();
     SetupInputComponent();
-}
 
+
+    AActor* Owner = GetOwner();
+
+    if (Owner)
+    {
+        APanaceaCharacter* Character = Cast<APanaceaCharacter>(Owner);
+        if (Character)
+        {
+            Crosshair = Character->GetCrosshairWidget();
+        }
+        else
+        {
+            UE_LOG(LogTemp, Warning, TEXT("Failed to cast Owner to APanaceaCharacter"));
+        }
+    }
+    else
+    {
+        UE_LOG(LogTemp, Warning, TEXT("Owner is null"));
+    }
+}
 // Called every frame
 void UGrabbingSystemComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
@@ -57,9 +77,11 @@ void UGrabbingSystemComponent::Grab()
         }
 
         PhysicsHandle->ReleaseComponent();
+        Crosshair->SetVisibility(ESlateVisibility::Visible);
     }
     else
     {
+        Crosshair->SetVisibility(ESlateVisibility::Hidden);
         // LINE TRACE and see if we reach any actors with physics body collision channel set
         UE_LOG(LogTemp, Warning, TEXT("Grab pressed"));
         auto HitResult = GetFirstPhysicsBodyInReach();
@@ -148,3 +170,4 @@ FVector UGrabbingSystemComponent::GetReachLineEnd()
     // Draw a line from the player showing the reach
     return PlayerViewPointLocation + PlayerViewPointRotation.Vector() * Reach;
 }
+
