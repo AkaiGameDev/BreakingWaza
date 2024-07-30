@@ -14,18 +14,34 @@ AIngridient::AIngridient()
 	//add tag Ingredient o the actor
 	Tags.Add("Ingredient");
 
-	MeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComponent"));
-	RootComponent = MeshComponent;
-
-
-
 }
 
 // Called when the game starts or when spawned
 void AIngridient::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	//get atached mesesh
+	TArray<UStaticMeshComponent*> Meshes;
+	GetComponents<UStaticMeshComponent>(Meshes);
+	if (Meshes.Num() > 0)
+	{
+		StaticMeshComponent = Meshes[0];
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Mesh Found: ") + GetActorLabel());
+
+		//get cube mesh from statick mesh componet
+		//UStaticMesh* CubeMesh = Cast<UStaticMesh>(StaticMeshComponent->GetStaticMesh());
+		//if (CubeMesh)
+		//{
+		//	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Cube Mesh Found: ") + GetActorLabel());
+		//}
+		//else
+	//	{
+		//	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Cube Mesh Not Found: ") + GetActorLabel());
+		//}
+
+	}
+
 }
 
 // Called every frame
@@ -37,25 +53,25 @@ void AIngridient::Tick(float DeltaTime)
 
 void AIngridient::Interact()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("Interacted With: ") + GetActorLabel());
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Magenta, TEXT("Interacted With: ") + GetActorLabel());
 }
 
 void AIngridient::OnInteractableInRange()
 {
-	SetMaterial(MaterialInRange);
-	UE_LOG(	LogTemp, Warning, TEXT("OnInteractableInRange"));
+	StaticMeshComponent->SetRenderCustomDepth(true);
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("In Range:") + GetActorLabel());
 }
 
 void AIngridient::OnInteractableOutOfRange()
 {
-	SetMaterial(MaterialOutOfRange);
-	UE_LOG(	LogTemp, Warning, TEXT("OnInteractableOutOfRange"));
+	StaticMeshComponent->SetRenderCustomDepth(false);
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, TEXT("Out Of Range:") + GetActorLabel());
 }
 
 void AIngridient::SetMaterial(UMaterialInterface* NewMaterial)
 {
-	if (NewMaterial && MeshComponent)
+	if (NewMaterial && StaticMeshComponent)
 	{
-		MeshComponent->SetMaterial(0, NewMaterial); // 0 is the index for the first material slot
+		StaticMeshComponent->SetMaterial(0, NewMaterial); // 0 is the index for the first material slot
 	}
 }

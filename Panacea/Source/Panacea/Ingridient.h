@@ -31,7 +31,7 @@ public:
 
 private:
 	UPROPERTY(VisibleAnywhere)
-	UStaticMeshComponent* MeshComponent;
+	UStaticMeshComponent* StaticMeshComponent;
 
 	UPROPERTY(EditAnywhere, Category = "Materials", meta = (AllowPrivate))
 	UMaterialInterface* MaterialInRange;
