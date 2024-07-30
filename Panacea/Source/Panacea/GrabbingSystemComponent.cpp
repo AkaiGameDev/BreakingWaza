@@ -67,7 +67,7 @@ void UGrabbingSystemComponent::Grab()
     }
     else
     {
-        Crosshair->SetVisibility(ESlateVisibility::Hidden);
+
         // LINE TRACE and see if we reach any actors with physics body collision channel set
         UE_LOG(LogTemp, Warning, TEXT("Grab pressed"));
         auto HitResult = GetFirstPhysicsBodyInReach();
@@ -82,6 +82,7 @@ void UGrabbingSystemComponent::Grab()
                 NAME_None, // no bones needed
                 ComponentToGrab->GetOwner()->GetActorLocation()
             );
+            Crosshair->SetVisibility(ESlateVisibility::Hidden);
         }
     }
 }
