@@ -2,7 +2,7 @@
 
 
 #include "Ingridient.h"
-
+#include "UObject/ConstructorHelpers.h"
 #include "Kismet/GameplayStatics.h"
 
 // Sets default values
@@ -14,7 +14,11 @@ AIngridient::AIngridient()
 	//add tag Ingredient o the actor
 	Tags.Add("Ingredient");
 
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("Interacted With: ") +  GetActorLabel());
+	MeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComponent"));
+	RootComponent = MeshComponent;
+
+
+
 }
 
 // Called when the game starts or when spawned
@@ -38,11 +42,20 @@ void AIngridient::Interact()
 
 void AIngridient::OnInteractableInRange()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("Interactable in range: ") + GetActorLabel());;
+	SetMaterial(MaterialInRange);
+	UE_LOG(	LogTemp, Warning, TEXT("OnInteractableInRange"));
 }
 
 void AIngridient::OnInteractableOutOfRange()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("Interactable out of range: ") + GetActorLabel());
+	SetMaterial(MaterialOutOfRange);
+	UE_LOG(	LogTemp, Warning, TEXT("OnInteractableOutOfRange"));
 }
 
+void AIngridient::SetMaterial(UMaterialInterface* NewMaterial)
+{
+	if (NewMaterial && MeshComponent)
+	{
+		MeshComponent->SetMaterial(0, NewMaterial); // 0 is the index for the first material slot
+	}
+}

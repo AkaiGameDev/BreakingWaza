@@ -29,6 +29,16 @@ public:
 	virtual void OnInteractableInRange() override;
 	virtual void OnInteractableOutOfRange() override;
 
+private:
+	UPROPERTY(VisibleAnywhere)
+	UStaticMeshComponent* MeshComponent;
 
+	UPROPERTY(EditAnywhere, Category = "Materials", meta = (AllowPrivate))
+	UMaterialInterface* MaterialInRange;
+
+	UPROPERTY(EditAnywhere, Category = "Materials", meta = (AllowPrivate))
+	UMaterialInterface* MaterialOutOfRange;
+
+	void SetMaterial(UMaterialInterface* NewMaterial);
 
 };

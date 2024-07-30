@@ -10,7 +10,6 @@
 
 UInteractiveComponent::UInteractiveComponent()
 {
-
 	PrimaryComponentTick.bCanEverTick = true;
 
 	// Create and initialize the sphere component
@@ -21,13 +20,6 @@ UInteractiveComponent::UInteractiveComponent()
 	SphereComponent->OnComponentEndOverlap.AddDynamic(this, &UInteractiveComponent::OnOverlapEnd);
 
 	SphereComponent->SetVisibility(true);
-
-	// Attach SphereComponent to RootComponent of the Actor
-	if (USceneComponent* RootComp = GetOwner() ? GetOwner()->GetRootComponent() : nullptr)
-	{
-		SphereComponent->SetupAttachment(RootComp);
-	}
-
 }
 
 
@@ -36,21 +28,27 @@ void UInteractiveComponent::BeginPlay()
 	Super::BeginPlay();
 	Owner = GetOwner();
 
+	// Attach SphereComponent to RootComponent of the Actor
+	if (USceneComponent* RootComp = GetOwner() ? GetOwner()->GetRootComponent() : nullptr)
+	{
+		SphereComponent->SetWorldLocation(GetOwner()->GetActorLocation());
+		SphereComponent->SetupAttachment(RootComp);
+		UE_LOG(LogTemp, Warning, TEXT("works"));
+	}
 }
 
 void UInteractiveComponent::TickComponent(float DeltaTime, ELevelTick TickType,
-	FActorComponentTickFunction* ThisTickFunction)
+                                          FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	if (AActor* OwnerActor = GetOwner())
 	{
-		// Calculate the position directly in front of the actor
 		FVector ForwardDirection = OwnerActor->GetActorForwardVector();
-		FVector FrontOffset = ForwardDirection * 300.0f; // Adjusted to 300 units in front of the actor
+		FVector FrontOffset = ForwardDirection * 100.0f; // Adjusted to 100 units in front of the actor
 		FVector NewLocation = OwnerActor->GetActorLocation() + FrontOffset;
 
-		// Set the sphere component's location
+
 		SphereComponent->SetWorldLocation(NewLocation);
 	}
 
@@ -63,27 +61,34 @@ void UInteractiveComponent::DrawDebugSphereVisualization() const
 	{
 		FVector Location = SphereComponent->GetComponentLocation();
 		float Radius = SphereComponent->GetScaledSphereRadius();
-		DrawDebugSphere(GetWorld(), Location, Radius, 12, FColor::Red, false, -1, 0, 1);
+		DrawDebugSphere(GetWorld(), Location, Radius, 12, FColor::Red, false, -1, 0, 0.3);
 	}
+
+	//UE_LOG(LogTemp, Warning, TEXT("%f, %f, %f"), SphereComponent->GetComponentLocation().X, SphereComponent->GetComponentLocation().Y, SphereComponent->GetComponentLocation().Z);
+	UE_LOG(LogTemp, Warning, TEXT("%f, %f, %f"), GetOwner()->GetActorLocation().X, GetOwner()->GetActorLocation().Y,
+	       GetOwner()->GetActorLocation().Z);
 }
 
-void UInteractiveComponent::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+void UInteractiveComponent::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+                                           UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
+                                           const FHitResult& SweepResult)
 {
 	if (IInteractable* Interactable = Cast<IInteractable>(OtherActor))
 	{
 		InteractableActors.AddUnique(OtherActor);
 		Interactable->OnInteractableInRange();
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("Looking at interactable actor"));
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("Interactable actor in range"));
 	}
 }
 
-void UInteractiveComponent::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+void UInteractiveComponent::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+                                         UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
 	if (IInteractable* Interactable = Cast<IInteractable>(OtherActor))
 	{
 		InteractableActors.Remove(OtherActor);
 		Interactable->OnInteractableOutOfRange();
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("Stopped looking at interactable actor"));
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("Interactable actor out of range"));
 	}
 }
 
@@ -98,8 +103,7 @@ void UInteractiveComponent::Interact(const FInputActionValue& Value)
 		if (Interactable)
 		{
 			Interactable->Interact();
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("Interacted with actor"));
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("Interacting with actor"));
 		}
 	}
 }
-
