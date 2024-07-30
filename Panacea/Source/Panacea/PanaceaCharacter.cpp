@@ -31,6 +31,10 @@ APanaceaCharacter::APanaceaCharacter()
 	FirstPersonCameraComponent->SetRelativeLocation(FVector(-10.f, 0.f, 60.f)); // Position the camera
 	FirstPersonCameraComponent->bUsePawnControlRotation = true;
 
+	// Create an InteractiveComponent
+	InteractiveComponent = CreateDefaultSubobject<UInteractiveComponent>(TEXT("InteractiveComponent"));
+
+
 	// Create a mesh component that will be used when being viewed from a '1st person' view (when controlling this pawn)
 	Mesh1P = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("CharacterMesh1P"));
 	Mesh1P->SetOnlyOwnerSee(true);
@@ -159,7 +163,11 @@ void APanaceaCharacter::Pause()
 
 void APanaceaCharacter::Interact(const FInputActionValue& Value)
 {
-	FVector Start;
+
+	//instead of this call the interact method of the interactable component
+	InteractiveComponent->Interact(Value);
+
+	/*FVector Start;
 	FRotator Rotation;
 	FVector End;
 	FHitResult HitResult;
@@ -172,34 +180,17 @@ void APanaceaCharacter::Interact(const FInputActionValue& Value)
 		FCollisionQueryParams CollisionParams;
 		CollisionParams.AddIgnoredActor(this);
 
-		// Draw the debug line from Start to End
-		DrawDebugLine(GetWorld(), Start, End, FColor::Green, false, 1, 0, 1);
-
-
 		if (GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_Visibility, CollisionParams))
 		{
 			AActor* HitActor = HitResult.GetActor();
 			if (HitActor)
 			{
-				// Draw a debug sphere at the hit location
-				DrawDebugSphere(GetWorld(), HitResult.Location, 10.0f, 12, FColor::Red, false, 1);
-
 				IInteractable* Interactable = Cast<IInteractable>(HitActor);
 				if (Interactable)
 				{
 					Interactable->Interact();
-					GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, TEXT("Interacted!"));
-				}
-				else
-				{
-					GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow,
-					                                 TEXT("Hit Actor does not implement IInteractable!"));
 				}
 			}
 		}
-		else
-		{
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, TEXT("No Interactable Object Found!"));
-		}
-	}
+	} */
 }

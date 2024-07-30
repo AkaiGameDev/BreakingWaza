@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "IInteractable.h"
+#include "InputActionValue.h"
 #include "InteractiveComponent.generated.h"
 
 
@@ -15,14 +17,16 @@ class PANACEA_API UInteractiveComponent : public UActorComponent
 public:	
 	// Sets default values for this component's properties
 	UInteractiveComponent();
+	void Interact(const FInputActionValue& Value);
+
 
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
+private:
+	AActor * Owner;
 
-public:	
-	// Called every frame
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+
 
 		
 };
