@@ -7,6 +7,7 @@
 #include "IInteractable.h"
 #include "Components/StaticMeshComponent.h"
 #include "DrawDebugHelpers.h"
+#include "Engine/Engine.h"
 
 UInteractiveComponent::UInteractiveComponent()
 {
@@ -16,24 +17,37 @@ UInteractiveComponent::UInteractiveComponent()
 	SphereComponent = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComponent"));
 	SphereComponent->InitSphereRadius(100.0f); // Set the radius for the sphere
 	SphereComponent->SetCollisionProfileName(TEXT("OverlapAllDynamic"));
+	SphereComponent->SetVisibility(true);
+
+	// Bind the overlap events
 	SphereComponent->OnComponentBeginOverlap.AddDynamic(this, &UInteractiveComponent::OnOverlapBegin);
 	SphereComponent->OnComponentEndOverlap.AddDynamic(this, &UInteractiveComponent::OnOverlapEnd);
-
-	SphereComponent->SetVisibility(true);
 }
-
 
 void UInteractiveComponent::BeginPlay()
 {
 	Super::BeginPlay();
+
+	// Ensure that the Owner is set
 	Owner = GetOwner();
 
 	// Attach SphereComponent to RootComponent of the Actor
-	if (USceneComponent* RootComp = GetOwner() ? GetOwner()->GetRootComponent() : nullptr)
+	if (Owner)
 	{
-		SphereComponent->SetWorldLocation(GetOwner()->GetActorLocation());
-		SphereComponent->SetupAttachment(RootComp);
-		UE_LOG(LogTemp, Warning, TEXT("works"));
+		if (USceneComponent* RootComp = Owner->GetRootComponent())
+		{
+			SphereComponent->AttachToComponent(RootComp, FAttachmentTransformRules::KeepRelativeTransform);
+			SphereComponent->SetRelativeLocation(FVector::ForwardVector * 100.0f); // Ensure it's at the root's location
+			UE_LOG(LogTemp, Warning, TEXT("SphereComponent attached successfully."));
+		}
+		else
+		{
+			UE_LOG(LogTemp, Error, TEXT("Root component is null."));
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("Owner is null."));
 	}
 }
 
@@ -41,17 +55,6 @@ void UInteractiveComponent::TickComponent(float DeltaTime, ELevelTick TickType,
                                           FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-	if (AActor* OwnerActor = GetOwner())
-	{
-		FVector ForwardDirection = OwnerActor->GetActorForwardVector();
-		FVector FrontOffset = ForwardDirection * 100.0f; // Adjusted to 100 units in front of the actor
-		FVector NewLocation = OwnerActor->GetActorLocation() + FrontOffset;
-
-
-		SphereComponent->SetWorldLocation(NewLocation);
-	}
-
 	DrawDebugSphereVisualization();
 }
 
@@ -64,9 +67,6 @@ void UInteractiveComponent::DrawDebugSphereVisualization() const
 		DrawDebugSphere(GetWorld(), Location, Radius, 12, FColor::Red, false, -1, 0, 0.3);
 	}
 
-	//UE_LOG(LogTemp, Warning, TEXT("%f, %f, %f"), SphereComponent->GetComponentLocation().X, SphereComponent->GetComponentLocation().Y, SphereComponent->GetComponentLocation().Z);
-	UE_LOG(LogTemp, Warning, TEXT("%f, %f, %f"), GetOwner()->GetActorLocation().X, GetOwner()->GetActorLocation().Y,
-	       GetOwner()->GetActorLocation().Z);
 }
 
 void UInteractiveComponent::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
