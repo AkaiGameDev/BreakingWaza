@@ -14,6 +14,7 @@ AIngridient::AIngridient()
 	//add tag Ingredient o the actor
 	Tags.Add("Ingredient");
 
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("Interacted With: ") +  GetActorLabel());
 }
 
 // Called when the game starts or when spawned
@@ -32,20 +33,16 @@ void AIngridient::Tick(float DeltaTime)
 
 void AIngridient::Interact()
 {
-	FString ActorName = GetName();
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("Interacted With: ") + ActorName);
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("Interacted With: ") + GetActorLabel());
 }
 
 void AIngridient::OnInteractableInRange()
 {
-	FString ActorName = GetName();
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("Interactable in range: ") + ActorName);
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("Interactable in range: ") + GetActorLabel());;
 }
 
 void AIngridient::OnInteractableOutOfRange()
 {
-
-	FString ActorName = GetName();
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("Interactable out of range: ") + ActorName);
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("Interactable out of range: ") + GetActorLabel());
 }
 

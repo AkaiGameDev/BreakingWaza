@@ -6,6 +6,7 @@
 #include "Components/ActorComponent.h"
 #include "Components/SphereComponent.h"
 #include "IInteractable.h"
+
 #include "InputActionValue.h"
 #include "InteractiveComponent.generated.h"
 
@@ -24,9 +25,15 @@ public:
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
+
+	//called every frame
+	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+
 private:
 	UPROPERTY(VisibleAnywhere)
 	AActor * Owner;
+
+
 
 	UFUNCTION()
 	void OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
