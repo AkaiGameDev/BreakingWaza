@@ -34,3 +34,16 @@ void ATestInteractableActor::Interact()
 	UGameplayStatics::OpenLevel(GetWorld(), LevelName);
 }
 
+void ATestInteractableActor::OnInteractableInRange()
+{
+	FString ActorName = GetName();
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("Interactable in range: ") + ActorName);
+}
+
+void ATestInteractableActor::OnInteractableOutOfRange()
+{
+
+	FString ActorName = GetName();
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("Interactable out of range: ") + ActorName);
+}
+
