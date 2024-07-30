@@ -15,7 +15,7 @@ UInteractiveComponent::UInteractiveComponent()
 
 	// Create and initialize the sphere component
 	SphereComponent = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComponent"));
-	SphereComponent->InitSphereRadius(100.0f); // Set the radius for the sphere
+	SphereComponent->InitSphereRadius(150.0f); // Set the radius for the sphere
 	SphereComponent->SetCollisionProfileName(TEXT("OverlapAllDynamic"));
 	SphereComponent->SetVisibility(true);
 
@@ -37,7 +37,7 @@ void UInteractiveComponent::BeginPlay()
 		if (USceneComponent* RootComp = Owner->GetRootComponent())
 		{
 			SphereComponent->AttachToComponent(RootComp, FAttachmentTransformRules::KeepRelativeTransform);
-			SphereComponent->SetRelativeLocation(FVector::ForwardVector * 100.0f); // Ensure it's at the root's location
+			SphereComponent->SetRelativeLocation(FVector::ForwardVector * 150.0f); // Ensure it's at the root's location
 			UE_LOG(LogTemp, Warning, TEXT("SphereComponent attached successfully."));
 		}
 		else
@@ -55,7 +55,7 @@ void UInteractiveComponent::TickComponent(float DeltaTime, ELevelTick TickType,
                                           FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-	DrawDebugSphereVisualization();
+	//DrawDebugSphereVisualization();
 }
 
 void UInteractiveComponent::DrawDebugSphereVisualization() const
