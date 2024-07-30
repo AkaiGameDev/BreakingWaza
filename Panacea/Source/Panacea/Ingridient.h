@@ -5,16 +5,16 @@
 #include "CoreMinimal.h"
 #include "IInteractable.h"
 #include "GameFramework/Actor.h"
-#include "TestInteractableActor.generated.h"
+#include "Ingridient.generated.h"
 
 UCLASS()
-class PANACEA_API ATestInteractableActor : public AActor, public IInteractable
+class PANACEA_API AIngridient : public AActor, public IInteractable
 {
 	GENERATED_BODY()
 	
 public:	
 	// Sets default values for this actor's properties
-	ATestInteractableActor();
+	AIngridient();
 
 protected:
 	// Called when the game starts or when spawned
