@@ -28,4 +28,8 @@ private:
 	ULoggingConfigManager();
 
 	FConfigData ConfigData;
+
+	FDateTime LastFileModificationTime;
+
+	void UpdateConfigIfNeeded();
 };

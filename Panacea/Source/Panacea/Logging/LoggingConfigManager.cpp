@@ -8,10 +8,10 @@ ULoggingConfigManager* ULoggingConfigManager::GetInstance()
 	if (!Instance)
 	{
 		Instance = NewObject<ULoggingConfigManager>();
-		Instance->AddToRoot(); // Prevent garbage collection
-		 // Load configuration after creation
+		Instance->AddToRoot();
+
 	}
-	Instance->LoadConfig();
+	Instance->UpdateConfigIfNeeded();
 	return Instance;
 }
 
@@ -65,6 +65,17 @@ void ULoggingConfigManager::LoadConfig()
 	}
 }
 
+void ULoggingConfigManager::UpdateConfigIfNeeded()
+{
+	const FString FilePath = FPaths::ProjectConfigDir() / TEXT("LoggingConfig.json");
+	FDateTime CurrentModificationTime = FPlatformFileManager::Get().GetPlatformFile().GetTimeStamp(*FilePath);
+
+	if (CurrentModificationTime != LastFileModificationTime)
+	{
+		LoadConfig(); // Reload the config if the file has changed
+	}
+}
+
 bool ULoggingConfigManager::IsLoggingEnabledForClass(const FString& ClassName) const
 {
 	const bool* BIsEnabled = ConfigData.LogSettings.Find(ClassName);
@@ -74,5 +85,5 @@ bool ULoggingConfigManager::IsLoggingEnabledForClass(const FString& ClassName) c
 ULoggingConfigManager::ULoggingConfigManager()
 {
 	ConfigData.LogSettings.Empty();
-	LoadConfig();
+	LastFileModificationTime = FDateTime::MinValue();
 }
