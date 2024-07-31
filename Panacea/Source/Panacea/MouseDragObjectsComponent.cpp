@@ -83,6 +83,7 @@ void UMouseDragObjectsComponent::TickComponent(float DeltaTime, ELevelTick TickT
 
 	FVector TargetLocation = WorldPosition + WorldDirection * OriginalDistanceToComponent;
 
+	PhysicsHandle->SetInterpolationSpeed(100.0);
 	PhysicsHandle->SetTargetLocation(TargetLocation);
 
 	UE_LOG(LogTemp, Log, TEXT("Position: X=%f, Y=%f, Z=%f"), WorldPosition.X, WorldPosition.Y, WorldPosition.Z);
@@ -148,10 +149,13 @@ UPrimitiveComponent* UMouseDragObjectsComponent::FindComponent(FHitResult& HitRe
 	QueryParams.bTraceComplex = true; // Trace against complex collisions (optional)
 	QueryParams.AddIgnoredActor(GetOwner());
 
-	bool bHit = World->LineTraceSingleByChannel(HitResult, WorldPosition, TraceEnd, ECC_Visibility, QueryParams);
+	FCollisionShape Shape = FCollisionShape::MakeBox(FVector(50, 50, 50));
+
+	bool bHit = World->SweepSingleByChannel(HitResult, WorldPosition, TraceEnd, FQuat::Identity, ECC_Visibility, Shape, QueryParams);
 
 	if (bHit)
 	{
+		UE_LOG(LogTemp, Log, TEXT("UMouseDragObjectsComponent::FindComponent(): Component hit"));
 		DrawDebugLine(World, WorldPosition, HitResult.ImpactPoint, FColor::Red, false, 3.0f);
 	}
 	else
@@ -166,32 +170,31 @@ void UMouseDragObjectsComponent::GrabComponent()
 	{
 		return;
 	}
+	if (!GrabbedComponent) {
+		FHitResult HitResult;
+		GrabbedComponent = FindComponent(HitResult);
 
-	FHitResult HitResult;
-	GrabbedComponent = FindComponent(HitResult);
+		if (!GrabbedComponent)
+		{
+			UE_LOG(LogTemp, Log, TEXT("UMouseDragObjectsComponent::GrabComponent(): No component was found to grab"));
+			return;
+		}
 
-	if (!GrabbedComponent)
-	{
-		UE_LOG(LogTemp, Log, TEXT("UMouseDragObjectsComponent::GrabComponent(): No component was found to grab"));
-		return;
+		OriginalDistanceToComponent = HitResult.Distance;
+
+		if (GrabbedComponent->Mobility != EComponentMobility::Movable)
+		{
+			UE_LOG(LogTemp, Log, TEXT("UMouseDragObjectsComponent::GrabComponent(): Component is not Movable"));
+			return;
+		}
+
+		if (!GrabbedComponent->IsSimulatingPhysics())
+		{
+			UE_LOG(LogTemp, Log, TEXT("UMouseDragObjectsComponent::GrabComponent(): Component is not simulating physics"));
+			return;
+		}
+		PhysicsHandle->GrabComponentAtLocation(GrabbedComponent, FName(), HitResult.Location);
 	}
-
-	OriginalDistanceToComponent = HitResult.Distance;
-
-	if (GrabbedComponent->Mobility != EComponentMobility::Movable)
-	{
-		UE_LOG(LogTemp, Log, TEXT("UMouseDragObjectsComponent::GrabComponent(): Component is not Movable"));
-		return;
-	}
-
-	if (!GrabbedComponent->IsSimulatingPhysics())
-	{
-		UE_LOG(LogTemp, Log, TEXT("UMouseDragObjectsComponent::GrabComponent(): Component is not simulating physics"));
-		return;
-	}
-
-	PhysicsHandle->GrabComponentAtLocation(GrabbedComponent, FName(), HitResult.Location);
-
 }
 
 void UMouseDragObjectsComponent::ReleaseComponent()
@@ -200,8 +203,7 @@ void UMouseDragObjectsComponent::ReleaseComponent()
 	{
 		return;
 	}
-
-	PhysicsHandle->ReleaseComponent();
-	GrabbedComponent = nullptr;
+	//PhysicsHandle->ReleaseComponent();
+	//GrabbedComponent = nullptr;
 }
 
