@@ -5,7 +5,6 @@
 
 ULoggingConfigManager* ULoggingConfigManager::GetInstance()
 {
-	//UE_LOG(	LogTemp, Warning, TEXT("LoggingConfigManager GetInstance called"));
 	static ULoggingConfigManager* Instance = nullptr;
 	if (!Instance)
 	{
@@ -89,10 +88,10 @@ bool ULoggingConfigManager::IsLoggingEnabledForClass(const FString& ClassName) c
 	const bool* BIsEnabled = ConfigData.LogSettings.Find(ClassName);
 	if (BIsEnabled)
 	{
-		UE_LOG(LogTemp, Log, TEXT("Logging enabled for %s"), *ClassName);
+		//UE_LOG(LogTemp, Log, TEXT("Logging enabled for %s"), *ClassName);
 		return *BIsEnabled;
 	}
-	UE_LOG(LogTemp, Log, TEXT("Logging NOT enabled for %s"), *ClassName);
+	//UE_LOG(LogTemp, Log, TEXT("Logging NOT enabled for %s"), *ClassName);
 	return false;
 }
 
