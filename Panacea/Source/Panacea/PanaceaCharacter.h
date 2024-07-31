@@ -70,9 +70,14 @@ class APanaceaCharacter : public ACharacter
 	/** Interact Input Action */
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	UInputAction* InteractAction;
+
+
+
 	
 public:
 	APanaceaCharacter();
+
+
 
 protected:
 	virtual void BeginPlay();
@@ -92,7 +97,11 @@ protected:
 
 	void Interact(const FInputActionValue& Value);
 
-protected:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
+	TSubclassOf<UUserWidget> CrosshairWidgetClass;
+
+	UUserWidget* CrosshairWidget;
+
 	// APawn interface
 	virtual void SetupPlayerInputComponent(UInputComponent* InputComponent) override;
 	// End of APawn interface
@@ -104,5 +113,7 @@ public:
 	UCameraComponent* GetFirstPersonCameraComponent() const { return FirstPersonCameraComponent; }
 	/** Returns DefaultMappingContext subobject **/
 	UInputMappingContext* GetDefaultMappingContext() const { return DefaultMappingContext; }
+
+	UUserWidget* GetCrosshairWidget() const;
 };
 

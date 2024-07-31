@@ -6,8 +6,11 @@
 #include "EnhancedInputComponent.h"
 #include "Engine/World.h"
 #include "GameFramework/Actor.h"
+
 #include "DrawDebugHelpers.h" // For debugging purposes
 #include "CollisionQueryParams.h"
+#include "Blueprint/UserWidget.h"
+#include "Components/SlateWrapperTypes.h"
 
 // Sets default values for this component's properties
 UMouseDragObjectsComponent::UMouseDragObjectsComponent()
@@ -26,7 +29,10 @@ void UMouseDragObjectsComponent::SetInitilizeReferences()
 	Character = Cast<APanaceaCharacter>(GetOwner());
 	if (!Character)
 	{
-		UE_LOG(LogTemp, Error, TEXT("An error has been encountered in the UMouseDragObjectsComponent::SetInitialiseReferences() method: Owner is not of class APanaceaCharacter "));
+		UE_LOG(LogTemp, Error,
+		       TEXT(
+			       "An error has been encountered in the UMouseDragObjectsComponent::SetInitialiseReferences() method: Owner is not of class APanaceaCharacter "
+		       ));
 		return;
 	}
 }
@@ -41,23 +47,31 @@ void UMouseDragObjectsComponent::BeginPlay()
 	PlayerController = Cast<APlayerController>(Character->GetController());
 	if (PlayerController)
 	{
-		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
+		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<
+			UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
 		{
 			Subsystem->AddMappingContext(MouseDragObjectsMappingContext, 1);
-			if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerController->InputComponent))
+			if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(
+				PlayerController->InputComponent))
 			{
-				EnhancedInputComponent->BindAction(GrabModeAction, ETriggerEvent::Triggered, this, &UMouseDragObjectsComponent::SwitchGrabMode);
-				EnhancedInputComponent->BindAction(GrabObjectAction, ETriggerEvent::Started, this, &UMouseDragObjectsComponent::GrabComponent);
-				EnhancedInputComponent->BindAction(GrabObjectAction, ETriggerEvent::Completed, this, &UMouseDragObjectsComponent::ReleaseComponent);
+				EnhancedInputComponent->BindAction(GrabModeAction, ETriggerEvent::Triggered, this,
+				                                   &UMouseDragObjectsComponent::SwitchGrabMode);
+				EnhancedInputComponent->BindAction(GrabObjectAction, ETriggerEvent::Started, this,
+				                                   &UMouseDragObjectsComponent::GrabComponent);
+				EnhancedInputComponent->BindAction(GrabObjectAction, ETriggerEvent::Completed, this,
+				                                   &UMouseDragObjectsComponent::ReleaseComponent);
 			}
 		}
 	}
 
+	//Get Reference to Crosshair Widget
+	Crosshair = Character->GetCrosshairWidget();
 }
 
 
 // Called every frame
-void UMouseDragObjectsComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+void UMouseDragObjectsComponent::TickComponent(float DeltaTime, ELevelTick TickType,
+                                               FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
@@ -96,6 +110,8 @@ void UMouseDragObjectsComponent::SwitchGrabMode()
 	bIsGrabMode = !bIsGrabMode;
 	if (bIsGrabMode)
 	{
+		Crosshair->SetVisibility(ESlateVisibility::Hidden);
+
 		// Set input mode to UI and Game
 		FInputModeGameAndUI InputMode;
 		InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
@@ -105,12 +121,11 @@ void UMouseDragObjectsComponent::SwitchGrabMode()
 		// Show the mouse cursor
 		PlayerController->bShowMouseCursor = true;
 
-		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
+		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<
+			UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
 		{
 			Subsystem->RemoveMappingContext(CharacterDefaultMappingContext);
 		}
-
-
 	}
 	else
 	{
@@ -119,9 +134,11 @@ void UMouseDragObjectsComponent::SwitchGrabMode()
 		PlayerController->SetInputMode(InputMode);
 		// Hide the mouse cursor
 		PlayerController->bShowMouseCursor = false;
+		Crosshair->SetVisibility(ESlateVisibility::Visible);
 
 
-		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
+		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<
+			UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
 		{
 			Subsystem->AddMappingContext(CharacterDefaultMappingContext, 0);
 		}
@@ -130,7 +147,6 @@ void UMouseDragObjectsComponent::SwitchGrabMode()
 
 UPrimitiveComponent* UMouseDragObjectsComponent::FindComponent(FHitResult& HitResult)
 {
-
 	FVector WorldPosition;
 	FVector WorldDirection;
 
@@ -139,7 +155,7 @@ UPrimitiveComponent* UMouseDragObjectsComponent::FindComponent(FHitResult& HitRe
 
 	// Get the world from the actor
 	UWorld* World = GetWorld();
-	if (!World)	return nullptr;
+	if (!World) return nullptr;
 
 	// Define start and end points for the line trace
 	FVector TraceEnd = WorldDirection * 10000.0f + WorldPosition;
@@ -191,7 +207,6 @@ void UMouseDragObjectsComponent::GrabComponent()
 	}
 
 	PhysicsHandle->GrabComponentAtLocation(GrabbedComponent, FName(), HitResult.Location);
-
 }
 
 void UMouseDragObjectsComponent::ReleaseComponent()
@@ -204,4 +219,3 @@ void UMouseDragObjectsComponent::ReleaseComponent()
 	PhysicsHandle->ReleaseComponent();
 	GrabbedComponent = nullptr;
 }
-
