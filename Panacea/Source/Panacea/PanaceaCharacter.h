@@ -6,6 +6,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Logging/LogMacros.h"
+#include "InteractiveComponent.h"
 #include "IInteractable.h"
 #include "PanaceaCharacter.generated.h"
 
@@ -46,6 +47,10 @@ class APanaceaCharacter : public ACharacter
 	/** Component for physic handling*/
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	UPhysicsHandleComponent* PhysicsHandleComponent;
+
+	/** Component for handling interaction */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	UInteractiveComponent* InteractiveComponent;
 
 	/** MappingContext */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))

@@ -31,6 +31,10 @@ APanaceaCharacter::APanaceaCharacter()
 	FirstPersonCameraComponent->SetRelativeLocation(FVector(-10.f, 0.f, 60.f)); // Position the camera
 	FirstPersonCameraComponent->bUsePawnControlRotation = true;
 
+	// Create an InteractiveComponent
+	InteractiveComponent = CreateDefaultSubobject<UInteractiveComponent>(TEXT("InteractiveComponent"));
+
+
 	// Create a mesh component that will be used when being viewed from a '1st person' view (when controlling this pawn)
 	Mesh1P = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("CharacterMesh1P"));
 	Mesh1P->SetOnlyOwnerSee(true);
@@ -95,21 +99,21 @@ void APanaceaCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 
 		//Reset Sequence
 		EnhancedInputComponent->BindAction(RestartAction, ETriggerEvent::Triggered, this,
-		                                   &APanaceaCharacter::OnRestart);
+			&APanaceaCharacter::OnRestart);
 
 		//Pause action
 		EnhancedInputComponent->BindAction(PauseAction, ETriggerEvent::Triggered, this, &APanaceaCharacter::Pause);
 
 		//Interact action
 		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Triggered, this,
-		                                   &APanaceaCharacter::Interact);
+			&APanaceaCharacter::Interact);
 	}
 	else
 	{
 		UE_LOG(LogTemplateCharacter, Error,
-		       TEXT(
-			       "'%s' Failed to find an Enhanced Input Component! This template is built to use the Enhanced Input system. If you intend to use the legacy system, then you will need to update this C++ file."
-		       ), *GetNameSafe(this));
+			TEXT(
+				"'%s' Failed to find an Enhanced Input Component! This template is built to use the Enhanced Input system. If you intend to use the legacy system, then you will need to update this C++ file."
+			), *GetNameSafe(this));
 	}
 }
 
@@ -159,47 +163,6 @@ void APanaceaCharacter::Pause()
 
 void APanaceaCharacter::Interact(const FInputActionValue& Value)
 {
-	FVector Start;
-	FRotator Rotation;
-	FVector End;
-	FHitResult HitResult;
-
-	APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
-	if (PlayerController)
-	{
-		PlayerController->GetPlayerViewPoint(Start, Rotation);
-		End = Start + (Rotation.Vector() * 500.0f);
-		FCollisionQueryParams CollisionParams;
-		CollisionParams.AddIgnoredActor(this);
-
-		// Draw the debug line from Start to End
-		DrawDebugLine(GetWorld(), Start, End, FColor::Green, false, 1, 0, 1);
-
-
-		if (GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_Visibility, CollisionParams))
-		{
-			AActor* HitActor = HitResult.GetActor();
-			if (HitActor)
-			{
-				// Draw a debug sphere at the hit location
-				DrawDebugSphere(GetWorld(), HitResult.Location, 10.0f, 12, FColor::Red, false, 1);
-
-				IInteractable* Interactable = Cast<IInteractable>(HitActor);
-				if (Interactable)
-				{
-					Interactable->Interact();
-					GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, TEXT("Interacted!"));
-				}
-				else
-				{
-					GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow,
-					                                 TEXT("Hit Actor does not implement IInteractable!"));
-				}
-			}
-		}
-		else
-		{
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, TEXT("No Interactable Object Found!"));
-		}
-	}
+	if (InteractiveComponent)
+		InteractiveComponent->Interact(Value);
 }
