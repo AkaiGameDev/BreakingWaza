@@ -1,0 +1,1 @@
+#include "LoggingConfigManager.h"

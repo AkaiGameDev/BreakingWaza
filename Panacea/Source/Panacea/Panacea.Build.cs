@@ -9,5 +9,13 @@ public class Panacea : ModuleRules
         PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
         PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "UMG" });
+
+        PublicIncludePaths.AddRange(
+            new string[]
+            {
+                "Panacea",
+                "Panacea/Logging"
+            });
+
     }
 }
