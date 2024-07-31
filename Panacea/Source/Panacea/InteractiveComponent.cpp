@@ -1,27 +1,28 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "InteractiveComponent.h"
 #include "GameFramework/Actor.h"
-#include "Components/SphereComponent.h"
+#include "Components/CapsuleComponent.h"
 #include "IInteractable.h"
 #include "Components/StaticMeshComponent.h"
 #include "DrawDebugHelpers.h"
 #include "Engine/Engine.h"
+#include "PanaceaCharacter.h"
+#include "Camera/CameraComponent.h"  // Ensure this is included
 
 UInteractiveComponent::UInteractiveComponent()
 {
 	PrimaryComponentTick.bCanEverTick = true;
 
-	// Create and initialize the sphere component
-	SphereComponent = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComponent"));
-	SphereComponent->InitSphereRadius(150.0f); // Set the radius for the sphere
-	SphereComponent->SetCollisionProfileName(TEXT("OverlapAllDynamic"));
-	SphereComponent->SetVisibility(true);
+	// Create and initialize the capsule component
+	CapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>(TEXT("CapsuleComponent"));
+	CapsuleComponent->InitCapsuleSize(20.0f, 170.0f); // Set the radius and half-height for the capsule
+	CapsuleComponent->SetCollisionProfileName(TEXT("OverlapAllDynamic"));
+	CapsuleComponent->SetVisibility(true);
 
 	// Bind the overlap events
-	SphereComponent->OnComponentBeginOverlap.AddDynamic(this, &UInteractiveComponent::OnOverlapBegin);
-	SphereComponent->OnComponentEndOverlap.AddDynamic(this, &UInteractiveComponent::OnOverlapEnd);
+	CapsuleComponent->OnComponentBeginOverlap.AddDynamic(this, &UInteractiveComponent::OnOverlapBegin);
+	CapsuleComponent->OnComponentEndOverlap.AddDynamic(this, &UInteractiveComponent::OnOverlapEnd);
 }
 
 void UInteractiveComponent::BeginPlay()
@@ -29,20 +30,30 @@ void UInteractiveComponent::BeginPlay()
 	Super::BeginPlay();
 
 	// Ensure that the Owner is set
-	Owner = GetOwner();
+	Owner = Cast<APanaceaCharacter>(GetOwner());
 
-	// Attach SphereComponent to RootComponent of the Actor
 	if (Owner)
 	{
-		if (USceneComponent* RootComp = Owner->GetRootComponent())
+		UCameraComponent* CameraComponent = Owner->GetFirstPersonCameraComponent();
+		if (CameraComponent)
 		{
-			SphereComponent->AttachToComponent(RootComp, FAttachmentTransformRules::KeepRelativeTransform);
-			SphereComponent->SetRelativeLocation(FVector::ForwardVector * 150.0f); // Ensure it's at the root's location
-			UE_LOG(LogTemp, Warning, TEXT("SphereComponent attached successfully."));
+			// Cast UCameraComponent to USceneComponent
+			USceneComponent* RootComp = Cast<USceneComponent>(CameraComponent);
+			if (RootComp)
+			{
+				CapsuleComponent->AttachToComponent(RootComp, FAttachmentTransformRules::KeepRelativeTransform);
+				CapsuleComponent->SetRelativeLocation(FVector::ForwardVector * 100.0f);
+				CapsuleComponent->SetRelativeRotation(FRotator(90.0f, 0.0f, 0.0f));
+				UE_LOG(LogTemp, Warning, TEXT("CapsuleComponent attached successfully."));
+			}
+			else
+			{
+				UE_LOG(LogTemp, Error, TEXT("Casting to USceneComponent failed."));
+			}
 		}
 		else
 		{
-			UE_LOG(LogTemp, Error, TEXT("Root component is null."));
+			UE_LOG(LogTemp, Error, TEXT("Camera component is null."));
 		}
 	}
 	else
@@ -52,58 +63,152 @@ void UInteractiveComponent::BeginPlay()
 }
 
 void UInteractiveComponent::TickComponent(float DeltaTime, ELevelTick TickType,
-                                          FActorComponentTickFunction* ThisTickFunction)
+	FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-	//DrawDebugSphereVisualization();
+	DrawDebugCapsuleVisualization();
 }
 
-void UInteractiveComponent::DrawDebugSphereVisualization() const
+void UInteractiveComponent::DrawDebugCapsuleVisualization() const
 {
 	if (AActor* OwnerActor = GetOwner())
 	{
-		FVector Location = SphereComponent->GetComponentLocation();
-		float Radius = SphereComponent->GetScaledSphereRadius();
-		DrawDebugSphere(GetWorld(), Location, Radius, 12, FColor::Red, false, -1, 0, 0.3);
+		FVector Location = CapsuleComponent->GetComponentLocation();
+		float HalfHeight = CapsuleComponent->GetScaledCapsuleHalfHeight();
+		float Radius = CapsuleComponent->GetScaledCapsuleRadius();
+		FQuat Rotation = CapsuleComponent->GetComponentQuat();
+		DrawDebugCapsule(GetWorld(), Location, HalfHeight, Radius, Rotation, FColor::Red, false, -1, 0, 0.3);
+	}
+}
+
+AActor* UInteractiveComponent::GetClosestToOwner(const TArray<AActor*>& ActorsToCheck)
+{
+	AActor* ClosestActor = nullptr;
+	float ClosestDistance = FLT_MAX;
+
+	// Iterate through the list of actors to find the closest one
+	for (AActor* InteractableActor : ActorsToCheck)
+	{
+		if (InteractableActor)
+		{
+			float Distance = FVector::Dist(Owner->GetActorLocation(), InteractableActor->GetActorLocation());
+			if (Distance < ClosestDistance)
+			{
+				ClosestDistance = Distance;
+				ClosestActor = InteractableActor;
+			}
+		}
 	}
 
+	return ClosestActor;
 }
 
 void UInteractiveComponent::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-                                           UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
-                                           const FHitResult& SweepResult)
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
+	const FHitResult& SweepResult)
 {
-	if (IInteractable* Interactable = Cast<IInteractable>(OtherActor))
+	if (Cast<IInteractable>(OtherActor) != nullptr)
 	{
 		InteractableActors.AddUnique(OtherActor);
-		Interactable->OnInteractableInRange();
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("Interactable actor in range"));
+
+		// Get the closest actor to the owner
+		AActor* NewActorInFocus = GetClosestToOwner(InteractableActors);
+		if (ActorInFocus != NewActorInFocus)
+		{
+			// Notify the old actor that it is out of range
+			if (IInteractable* OldInteractable = Cast<IInteractable>(ActorInFocus))
+			{
+				OldInteractable->OnInteractableOutOfRange();
+			}
+
+			ActorInFocus = NewActorInFocus;
+
+			// Notify the new actor that it is in range
+			if (IInteractable* NewInteractable = Cast<IInteractable>(ActorInFocus))
+			{
+				NewInteractable->OnInteractableInRange();
+			}
+		}
 	}
 }
 
 void UInteractiveComponent::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-                                         UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
 	if (IInteractable* Interactable = Cast<IInteractable>(OtherActor))
 	{
 		InteractableActors.Remove(OtherActor);
 		Interactable->OnInteractableOutOfRange();
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("Interactable actor out of range"));
-	}
-}
 
-
-void UInteractiveComponent::Interact(const FInputActionValue& Value)
-{
-	if (InteractableActors.Num() > 0)
-	{
-		// Interact with the first actor in the list for simplicity
-		AActor* ActorToInteract = InteractableActors[0];
-		IInteractable* Interactable = Cast<IInteractable>(ActorToInteract);
-		if (Interactable)
+		// If the actor going out of range was in focus, update the focus
+		if (OtherActor == ActorInFocus)
 		{
-			Interactable->Interact();
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("Interacting with actor"));
+			if (IInteractable* OldInteractable = Cast<IInteractable>(ActorInFocus))
+			{
+				OldInteractable->OnInteractableOutOfRange();
+			}
+
+			// Get the new closest actor to the owner
+			ActorInFocus = GetClosestToOwner(InteractableActors);
+
+			// Notify the new actor that it is in range
+			if (IInteractable* InteractableToCast = Cast<IInteractable>(ActorInFocus))
+			{
+				InteractableToCast->OnInteractableInRange();
+			}
 		}
 	}
 }
+
+void UInteractiveComponent::Interact(const FInputActionValue& Value)
+{
+	if (ActorInFocus)
+	{
+		if (IInteractable* Interactable = Cast<IInteractable>(ActorInFocus))
+		{
+			/*Grab();*/
+			Interactable->Interact();
+		}
+	}
+}
+
+void UInteractiveComponent::Grab()
+{
+	if (!Owner)
+	{
+		UE_LOG(LogTemp, Error, TEXT("Owner is null."));
+		return;
+	}
+
+	UE_LOG(LogTemp, Warning, TEXT("Works1"));
+
+	UCameraComponent* CameraComponent = Owner->GetFirstPersonCameraComponent();
+	if (!CameraComponent)
+	{
+		UE_LOG(LogTemp, Error, TEXT("Camera component is null."));
+		return;
+	}
+
+	UE_LOG(LogTemp, Warning, TEXT("Works2"));
+
+	// Ensure ActorInFocus is not null before using it
+	if (!ActorInFocus)
+	{
+		UE_LOG(LogTemp, Error, TEXT("ActorInFocus is null."));
+		return;
+	}
+
+	// Cast UCameraComponent to USceneComponent
+	USceneComponent* RootComp = Cast<USceneComponent>(CameraComponent);
+	if (!RootComp)
+	{
+		UE_LOG(LogTemp, Error, TEXT("Casting to USceneComponent failed."));
+		return;
+	}
+
+	// Attach ActorInFocus to RootComp
+	ActorInFocus->AttachToComponent(RootComp, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+	ActorInFocus->SetActorRelativeLocation(/*FVector::ForwardVector * GrabbedActorLocation.X + FVector::RightVector * GrabbedActorLocation.Y + FVector::UpVector * GrabbedActorLocation.Z*/ FVector::ZeroVector);
+	
+}
+
