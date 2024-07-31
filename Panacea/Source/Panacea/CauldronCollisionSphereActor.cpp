@@ -25,7 +25,7 @@ ACauldronCollisionSphereActor::ACauldronCollisionSphereActor()
 
 	// Print a string to the viewport
 
-	LOG_WARNING(TEXT("ACauldronCollisionSphereActor"), TEXT("Constructor called"));
+	LOG_ERROR(TEXT("ACauldronCollisionSphereActor"),"Constructor called=%d",100);
 
 }
 

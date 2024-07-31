@@ -4,12 +4,11 @@
 ULogManager* ULogManager::GetInstance()
 {
 	static ULogManager* Instance = NewObject<ULogManager>();
-	//UE_LOG(	LogTemp, Warning, TEXT("LogManager GetInstance called"));
 	if (!Instance)
 	{
 		Instance = NewObject<ULogManager>();
 		Instance->AddToRoot(); // Prevent garbage collection
-		Instance->LoadConfig(); // Load configuration after creation
+		Instance->LoadConfig(); // Ensure this function exists in ULogManager
 	}
 	return Instance;
 }
