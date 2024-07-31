@@ -19,7 +19,7 @@ class PANACEA_API ULoggingConfigManager : public UObject
 	GENERATED_BODY()
 
 public:
-	static ULoggingConfigManager& GetInstance();
+	static ULoggingConfigManager* GetInstance();
 
 	void LoadConfig();
 	bool IsLoggingEnabledForClass(const FString& ClassName) const;

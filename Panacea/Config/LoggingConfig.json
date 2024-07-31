@@ -1,7 +1,6 @@
 {
-  "LogSettings": {
-    "ClassA": true,
-    "ClassB": false,
-    "ClassC": true
+  "Logging": {
+    "ACauldronCollisionSphereActor": true,
+    "ULoggingConfigManager": true
   }
 }
