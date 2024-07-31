@@ -9,8 +9,9 @@ ULoggingConfigManager* ULoggingConfigManager::GetInstance()
 	{
 		Instance = NewObject<ULoggingConfigManager>();
 		Instance->AddToRoot(); // Prevent garbage collection
-		Instance->LoadConfig(); // Load configuration after creation
+		 // Load configuration after creation
 	}
+	Instance->LoadConfig();
 	return Instance;
 }
 
