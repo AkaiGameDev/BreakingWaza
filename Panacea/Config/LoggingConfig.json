@@ -1,6 +1,5 @@
 {
   "Logging": {
-    "ACauldronCollisionSphereActor": true,
-    "ULoggingConfigManager": true
+    "ACauldronCollisionSphereActor": true
   }
 }

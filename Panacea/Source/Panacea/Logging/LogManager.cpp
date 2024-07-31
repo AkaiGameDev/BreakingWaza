@@ -4,7 +4,7 @@
 ULogManager* ULogManager::GetInstance()
 {
 	static ULogManager* Instance = NewObject<ULogManager>();
-	UE_LOG(	LogTemp, Warning, TEXT("LogManager GetInstance called"));
+	//UE_LOG(	LogTemp, Warning, TEXT("LogManager GetInstance called"));
 	if (!Instance)
 	{
 		Instance = NewObject<ULogManager>();
