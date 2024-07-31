@@ -5,7 +5,8 @@
 #include "GameFramework/PlayerController.h"
 #include "PanaceaCharacter.h"
 #include "Components/InputComponent.h"
-#include <EnhancedInputComponent.h>
+#include "EnhancedInputComponent.h"
+#include "Camera/CameraComponent.h"  // Ensure this is included
 
 // Sets default values for this component's properties
 UGrabbingSystemComponent::UGrabbingSystemComponent()
@@ -56,35 +57,49 @@ void UGrabbingSystemComponent::TickComponent(float DeltaTime, ELevelTick TickTyp
 
 void UGrabbingSystemComponent::Grab()
 {
-    if (!PhysicsHandle) { return; }
+    if (/*!PhysicsHandle*/ true) { return; }
 
-    if (PhysicsHandle->GrabbedComponent)
-    {
-        // If we're currently grabbing something, release it
-        UE_LOG(LogTemp, Warning, TEXT("Grab released"));
-        PhysicsHandle->ReleaseComponent();
-        Crosshair->SetVisibility(ESlateVisibility::Visible);
-    }
-    else
-    {
+   
 
         // LINE TRACE and see if we reach any actors with physics body collision channel set
-        UE_LOG(LogTemp, Warning, TEXT("Grab pressed"));
         auto HitResult = GetFirstPhysicsBodyInReach();
         auto ComponentToGrab = HitResult.GetComponent(); // gets the mesh in our case
-        auto ActorHit = HitResult.GetActor();
 
-        // If we hit something and it has the "Ingredient" tag, then attach a physics handle
-        if (ActorHit && ActorHit->ActorHasTag("Ingredient"))
-        {
-            PhysicsHandle->GrabComponentAtLocation(
-                ComponentToGrab,
-                NAME_None, // no bones needed
-                ComponentToGrab->GetOwner()->GetActorLocation()
-            );
+        APanaceaCharacter* Owner = Cast<APanaceaCharacter>(GetOwner());
+            UE_LOG(LogTemp, Warning, TEXT("Works"));
+
+            if (Owner)
+            {
+                UE_LOG(LogTemp, Warning, TEXT("Works1"));
+
+                UCameraComponent* CameraComponent = Owner->GetFirstPersonCameraComponent();
+                if (CameraComponent)
+                {
+                    UE_LOG(LogTemp, Warning, TEXT("Works2"));
+
+                    // Cast UCameraComponent to USceneComponent
+                    USceneComponent* RootComp = Cast<USceneComponent>(CameraComponent);
+                    if (RootComp)
+                    {
+                        ComponentToGrab->AttachToComponent(RootComp, FAttachmentTransformRules::KeepRelativeTransform);
+                        ComponentToGrab->SetRelativeLocation(FVector::ZeroVector);
+                        UE_LOG(LogTemp, Warning, TEXT("CapsuleComponent attached successfully."));
+                    
+                        UE_LOG(LogTemp, Warning, TEXT("Works3"));
+
+                    }
+                    else
+                    {
+                        UE_LOG(LogTemp, Error, TEXT("Casting to USceneComponent failed."));
+                    }
+                }
+                else
+                {
+                    UE_LOG(LogTemp, Error, TEXT("Camera component is null."));
+                }
+            }
             Crosshair->SetVisibility(ESlateVisibility::Hidden);
-        }
-    }
+    
 }
 
 
@@ -119,7 +134,7 @@ const FHitResult UGrabbingSystemComponent::GetFirstPhysicsBodyInReach()
         OUT HitResult,
         GetReachLineStart(),
         GetReachLineEnd(),
-        FCollisionObjectQueryParams(ECollisionChannel::ECC_PhysicsBody),
+        ECC_Visibility,
         TraceParams
     );
 
