@@ -1,0 +1,7 @@
+{
+  "LogSettings": {
+    "ClassA": true,
+    "ClassB": false,
+    "ClassC": true
+  }
+}
