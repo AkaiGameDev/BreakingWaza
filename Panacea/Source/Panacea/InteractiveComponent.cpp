@@ -122,6 +122,7 @@ void UInteractiveComponent::OnOverlapBegin(UPrimitiveComponent* OverlappedCompon
 			if (IInteractable* OldInteractable = Cast<IInteractable>(ActorInFocus))
 			{
 				OldInteractable->OnInteractableOutOfRange();
+				HintInteractionWidget->SetVisibility(ESlateVisibility::Hidden);
 			}
 
 			ActorInFocus = NewActorInFocus;
@@ -161,6 +162,7 @@ void UInteractiveComponent::OnOverlapEnd(UPrimitiveComponent* OverlappedComponen
 			if (IInteractable* InteractableToCast = Cast<IInteractable>(ActorInFocus))
 			{
 				InteractableToCast->OnInteractableInRange();
+				HintInteractionWidget->SetVisibility(ESlateVisibility::Visible);
 			}
 		}
 	}
