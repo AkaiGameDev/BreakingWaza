@@ -6,7 +6,11 @@
 #include "IInteractable.h"
 #include "GameFramework/Actor.h"
 
+class USwitchComponent;
+
 #include "Ingridient.generated.h"
+
+
 
 UCLASS()
 class PANACEA_API AIngridient : public AActor, public IInteractable
@@ -34,6 +38,8 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Mesh")
 	UStaticMeshComponent* StaticMeshComponent;
 
+	UPROPERTY(VisibleAnywhere, Category = "Components")
+	USwitchComponent* SwitchComponent;
 
 	void SetMaterial(UMaterialInterface* NewMaterial);
 

@@ -24,9 +24,10 @@ protected:
 	AActor* OriginalViewTarget;
 
 public:	
-	// Called every frame
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+
 	void SwitchCamera();
+	void SetupAttachment(TObjectPtr<USceneComponent> Object);
+
 
 
 	UPROPERTY(EditAnywhere, Category = "Camera")

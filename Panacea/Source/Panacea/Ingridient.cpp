@@ -4,7 +4,7 @@
 #include "Ingridient.h"
 #include "UObject/ConstructorHelpers.h"
 #include "Components/StaticMeshComponent.h"
-
+#include "SwitchComponent.h"
 #include "Kismet/GameplayStatics.h"
 
 // Sets default values
@@ -16,11 +16,13 @@ AIngridient::AIngridient()
 	//add tag Ingredient o the actor
 	Tags.Add("Ingredient");
 
+	// Create and initialize StaticMeshComponent
+	StaticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMeshComponent"));
+	RootComponent = StaticMeshComponent;
 
-
-	//add switch camera component
-
-
+	// Create and initialize SwitchComponent
+	SwitchComponent = CreateDefaultSubobject<USwitchComponent>(TEXT("SwitchComponent"));
+	SwitchComponent->SetupAttachment(RootComponent);
 
 }
 
@@ -51,7 +53,14 @@ void AIngridient::Tick(float DeltaTime)
 void AIngridient::Interact()
 {
 	//call the switch camera component to switch the camera
-
+	if (SwitchComponent)
+	{
+		SwitchComponent->SwitchCamera();
+	}
+	else
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("SwitchComponent not found"));
+	}
 }
 
 void AIngridient::OnInteractableInRange()

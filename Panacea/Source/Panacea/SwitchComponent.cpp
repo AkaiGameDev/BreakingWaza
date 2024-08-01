@@ -2,7 +2,6 @@
 
 
 #include "SwitchComponent.h"
-
 #include "Kismet/GameplayStatics.h"
 
 // Sets default values for this component's properties
@@ -12,10 +11,22 @@ USwitchComponent::USwitchComponent()
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
 
+	// Create and configure the camera component
 	ObjectCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("ObjectCamera"));
-	//set position of the camera
-	ObjectCamera->SetRelativeLocation(FVector(400.f, 400.f, 400.f));
-	ObjectCamera->SetRelativeRotation(FRotator(-30.f, 0.f, 0.f));
+
+	// Ensure ObjectCamera is properly attached to a scene component
+	// For this example, we'll attach it to the owner’s root component
+	if (GetOwner())
+	{
+		USceneComponent* Root = GetOwner()->GetRootComponent();
+		if (Root)
+		{
+			ObjectCamera->SetupAttachment(Root); // Attach to root component
+		}
+	}
+
+	ObjectCamera->SetRelativeLocation(FVector(400.f, 400.f, 400.f)); // Adjust as needed
+	ObjectCamera->SetRelativeRotation(FRotator(-30.f, 0.f, 0.f)); // Adjust as needed
 
 	OriginalViewTarget = nullptr;
 }
@@ -26,54 +37,48 @@ void USwitchComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	TArray<UCameraComponent*> Cameras;
-	if (Cameras.Num() > 0)
-	{
-		ObjectCamera = Cameras[0];
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Camera Found"));
-	}
-
-	// Confirm camera setup
 	if (ObjectCamera)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Camera Location: %s"), *ObjectCamera->GetRelativeLocation().ToString()));
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Camera Rotation: %s"), *ObjectCamera->GetRelativeRotation().ToString()));
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Camera Found"));
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red,
+		                                 FString::Printf(
+			                                 TEXT("Camera Location: %s"),
+			                                 *ObjectCamera->GetRelativeLocation().ToString()));
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red,
+		                                 FString::Printf(
+			                                 TEXT("Camera Rotation: %s"),
+			                                 *ObjectCamera->GetRelativeRotation().ToString()));
 	}
-}
-
-
-// Called every frame
-void USwitchComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
-{
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-	// ...
 }
 
 
 void USwitchComponent::SwitchCamera()
 {
-	// Get player controller
 	APlayerController* PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
 	if (!PlayerController)
 	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("PlayerController not found"));
 		return;
 	}
 
-	// If currently viewing from the object's camera, switch back to the original view
-	if (PlayerController->GetViewTarget() == this)
+	if (PlayerController->GetViewTarget() == GetOwner())
 	{
 		if (OriginalViewTarget)
 		{
 			PlayerController->SetViewTargetWithBlend(OriginalViewTarget, 0.5f, EViewTargetBlendFunction::VTBlend_Cubic);
 			OriginalViewTarget = nullptr;
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("Switched back to original view"));
 		}
 	}
 	else
 	{
-		// Store the original view target
 		OriginalViewTarget = PlayerController->GetViewTarget();
-
-
+		PlayerController->SetViewTargetWithBlend(GetOwner(), 0.5f, EViewTargetBlendFunction::VTBlend_Cubic);
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("Switched to object camera view"));
 	}
+}
+
+void USwitchComponent::SetupAttachment(TObjectPtr<USceneComponent> Object)
+{
+	ObjectCamera->SetupAttachment(Object);
 }
