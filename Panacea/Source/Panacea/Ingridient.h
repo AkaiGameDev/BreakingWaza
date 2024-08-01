@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "IInteractable.h"
 #include "GameFramework/Actor.h"
+
 #include "Ingridient.generated.h"
 
 UCLASS()
@@ -30,14 +31,9 @@ public:
 	virtual void OnInteractableOutOfRange() override;
 
 private:
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(EditAnywhere, Category = "Mesh")
 	UStaticMeshComponent* StaticMeshComponent;
 
-	UPROPERTY(EditAnywhere, Category = "Materials", meta = (AllowPrivate))
-	UMaterialInterface* MaterialInRange;
-
-	UPROPERTY(EditAnywhere, Category = "Materials", meta = (AllowPrivate))
-	UMaterialInterface* MaterialOutOfRange;
 
 	void SetMaterial(UMaterialInterface* NewMaterial);
 

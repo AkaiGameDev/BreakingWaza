@@ -3,6 +3,8 @@
 
 #include "Ingridient.h"
 #include "UObject/ConstructorHelpers.h"
+#include "Components/StaticMeshComponent.h"
+
 #include "Kismet/GameplayStatics.h"
 
 // Sets default values
@@ -14,6 +16,12 @@ AIngridient::AIngridient()
 	//add tag Ingredient o the actor
 	Tags.Add("Ingredient");
 
+
+
+	//add switch camera component
+
+
+
 }
 
 // Called when the game starts or when spawned
@@ -21,26 +29,15 @@ void AIngridient::BeginPlay()
 {
 	Super::BeginPlay();
 
-	//get atached mesesh
 	TArray<UStaticMeshComponent*> Meshes;
 	GetComponents<UStaticMeshComponent>(Meshes);
 	if (Meshes.Num() > 0)
 	{
 		StaticMeshComponent = Meshes[0];
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Mesh Found: ") + GetActorLabel());
-
-		//get cube mesh from statick mesh componet
-		//UStaticMesh* CubeMesh = Cast<UStaticMesh>(StaticMeshComponent->GetStaticMesh());
-		//if (CubeMesh)
-		//{
-		//	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Cube Mesh Found: ") + GetActorLabel());
-		//}
-		//else
-	//	{
-		//	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Cube Mesh Not Found: ") + GetActorLabel());
-		//}
-
 	}
+
+
 
 }
 
@@ -53,7 +50,8 @@ void AIngridient::Tick(float DeltaTime)
 
 void AIngridient::Interact()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Magenta, TEXT("Interacted With: ") + GetActorLabel());
+	//call the switch camera component to switch the camera
+
 }
 
 void AIngridient::OnInteractableInRange()
