@@ -35,7 +35,7 @@ class APanaceaCharacter : public ACharacter
 	/** First person camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	UCameraComponent* FirstPersonCameraComponent;
-	
+
 	/** Component for Draging objects by mouse */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	UMouseDragObjectsComponent* MouseDragObjectsComponent;
@@ -76,16 +76,11 @@ class APanaceaCharacter : public ACharacter
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	UInputAction* InteractAction;
 
-
-
-	
 public:
 	APanaceaCharacter();
 
-
-
 protected:
-	virtual void BeginPlay();
+	virtual void BeginPlay() override;
 
 protected:
 	/** Called for movement input */
@@ -96,7 +91,7 @@ protected:
 
 	/** Called When Player Restarts Game */
 	void OnRestart();
-	
+
 	/** Called When Player pauses Game */
 	void Pause();
 
@@ -105,7 +100,11 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
 	TSubclassOf<UUserWidget> CrosshairWidgetClass;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
+	TSubclassOf<UUserWidget> HintInteractionWidgetClass;
+
 	UUserWidget* CrosshairWidget;
+	UUserWidget* HintInteractionWidget;
 
 	// APawn interface
 	virtual void SetupPlayerInputComponent(UInputComponent* InputComponent) override;
@@ -120,5 +119,5 @@ public:
 	UInputMappingContext* GetDefaultMappingContext() const { return DefaultMappingContext; }
 
 	UUserWidget* GetCrosshairWidget() const;
+	UUserWidget* GetHintInteractionWidget() const;
 };
-

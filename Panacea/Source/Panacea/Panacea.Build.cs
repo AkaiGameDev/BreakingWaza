@@ -14,8 +14,7 @@ public class Panacea : ModuleRules
         PublicIncludePaths.AddRange(
             new string[]
             {
-                "Panacea",
-                "Panacea/Logging"
+                "Panacea"
             });
 
     }

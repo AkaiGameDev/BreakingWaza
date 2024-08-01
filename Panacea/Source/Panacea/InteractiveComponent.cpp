@@ -8,6 +8,7 @@
 #include "DrawDebugHelpers.h"
 #include "Engine/Engine.h"
 #include "PanaceaCharacter.h"
+#include "Blueprint/UserWidget.h"
 #include "Camera/CameraComponent.h"  // Ensure this is included
 
 UInteractiveComponent::UInteractiveComponent()
@@ -35,6 +36,8 @@ void UInteractiveComponent::BeginPlay()
 	if (Owner)
 	{
 		UCameraComponent* CameraComponent = Owner->GetFirstPersonCameraComponent();
+		HintInteractionWidget = Owner->GetHintInteractionWidget();
+		HintInteractionWidget->SetVisibility(ESlateVisibility::Hidden);
 		if (CameraComponent)
 		{
 			// Cast UCameraComponent to USceneComponent
@@ -119,6 +122,7 @@ void UInteractiveComponent::OnOverlapBegin(UPrimitiveComponent* OverlappedCompon
 			if (IInteractable* OldInteractable = Cast<IInteractable>(ActorInFocus))
 			{
 				OldInteractable->OnInteractableOutOfRange();
+				HintInteractionWidget->SetVisibility(ESlateVisibility::Hidden);
 			}
 
 			ActorInFocus = NewActorInFocus;
@@ -127,6 +131,8 @@ void UInteractiveComponent::OnOverlapBegin(UPrimitiveComponent* OverlappedCompon
 			if (IInteractable* NewInteractable = Cast<IInteractable>(ActorInFocus))
 			{
 				NewInteractable->OnInteractableInRange();
+				HintInteractionWidget->SetVisibility(ESlateVisibility::Visible);
+
 			}
 		}
 	}
@@ -146,6 +152,7 @@ void UInteractiveComponent::OnOverlapEnd(UPrimitiveComponent* OverlappedComponen
 			if (IInteractable* OldInteractable = Cast<IInteractable>(ActorInFocus))
 			{
 				OldInteractable->OnInteractableOutOfRange();
+				HintInteractionWidget->SetVisibility(ESlateVisibility::Hidden);
 			}
 
 			// Get the new closest actor to the owner
@@ -155,6 +162,7 @@ void UInteractiveComponent::OnOverlapEnd(UPrimitiveComponent* OverlappedComponen
 			if (IInteractable* InteractableToCast = Cast<IInteractable>(ActorInFocus))
 			{
 				InteractableToCast->OnInteractableInRange();
+				HintInteractionWidget->SetVisibility(ESlateVisibility::Visible);
 			}
 		}
 	}

@@ -70,6 +70,18 @@ void APanaceaCharacter::BeginPlay()
 		}
 	}
 
+	if (HintInteractionWidgetClass)
+	{
+		HintInteractionWidget = CreateWidget<UUserWidget>(GetWorld(), HintInteractionWidgetClass);
+
+		if (HintInteractionWidget)
+		{
+			HintInteractionWidget->AddToViewport();
+
+			UE_LOG(LogTemp, Warning, TEXT("Hint Interaction widget created"));
+		}
+	}
+
 	// Call the base class  
 	Super::BeginPlay();
 
@@ -99,28 +111,32 @@ void APanaceaCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 
 		//Reset Sequence
 		EnhancedInputComponent->BindAction(RestartAction, ETriggerEvent::Triggered, this,
-			&APanaceaCharacter::OnRestart);
+		                                   &APanaceaCharacter::OnRestart);
 
 		//Pause action
 		EnhancedInputComponent->BindAction(PauseAction, ETriggerEvent::Triggered, this, &APanaceaCharacter::Pause);
 
 		//Interact action
 		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Triggered, this,
-			&APanaceaCharacter::Interact);
+		                                   &APanaceaCharacter::Interact);
 	}
 	else
 	{
 		UE_LOG(LogTemplateCharacter, Error,
-			TEXT(
-				"'%s' Failed to find an Enhanced Input Component! This template is built to use the Enhanced Input system. If you intend to use the legacy system, then you will need to update this C++ file."
-			), *GetNameSafe(this));
+		       TEXT(
+			       "'%s' Failed to find an Enhanced Input Component! This template is built to use the Enhanced Input system. If you intend to use the legacy system, then you will need to update this C++ file."
+		       ), *GetNameSafe(this));
 	}
 }
 
 UUserWidget* APanaceaCharacter::GetCrosshairWidget() const
 {
-	UE_LOG(LogTemp, Warning, TEXT("Geting Crosshair Widget"));
 	return CrosshairWidget;
+}
+
+UUserWidget* APanaceaCharacter::GetHintInteractionWidget() const
+{
+	return HintInteractionWidget;
 }
 
 
