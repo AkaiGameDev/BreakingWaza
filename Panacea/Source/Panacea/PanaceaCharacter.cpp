@@ -14,6 +14,8 @@
 #include "Blueprint/UserWidget.h"
 #include "GrabbingSystemComponent.h"
 #include "MouseDragObjectsComponent.h"
+#include "InteractiveComponent.h"
+
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -31,10 +33,6 @@ APanaceaCharacter::APanaceaCharacter()
 	FirstPersonCameraComponent->SetRelativeLocation(FVector(-10.f, 0.f, 60.f)); // Position the camera
 	FirstPersonCameraComponent->bUsePawnControlRotation = true;
 
-	// Create an InteractiveComponent
-	InteractiveComponent = CreateDefaultSubobject<UInteractiveComponent>(TEXT("InteractiveComponent"));
-
-
 	// Create a mesh component that will be used when being viewed from a '1st person' view (when controlling this pawn)
 	Mesh1P = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("CharacterMesh1P"));
 	Mesh1P->SetOnlyOwnerSee(true);
@@ -50,6 +48,10 @@ APanaceaCharacter::APanaceaCharacter()
 	GrabbingSystemComponent = CreateDefaultSubobject<UGrabbingSystemComponent>(TEXT("GrabbingSystemComponent"));
 
 	PhysicsHandleComponent = CreateDefaultSubobject<UPhysicsHandleComponent>(TEXT("PhysicsHandleComponent"));
+
+	// Create an InteractiveComponent
+	InteractiveComponent = CreateDefaultSubobject<UInteractiveComponent>(TEXT("InteractiveComponent"));
+
 }
 
 void APanaceaCharacter::BeginPlay()
