@@ -57,4 +57,5 @@ private:
     TArray<AActor*> InteractableActors;
 
     AActor* ActorInFocus = nullptr;
+    UUserWidget* HintInteractionWidget = nullptr;
 };
