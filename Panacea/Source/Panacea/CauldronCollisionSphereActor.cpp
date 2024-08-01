@@ -5,8 +5,6 @@
 
 #include "Engine/Engine.h"
 #include "PanaceaGameMode.h"
-#include "LogMacros.h"
-#include "LogManager.h"
 #include "Kismet/GameplayStatics.h"
 
 // Sets default values
@@ -23,9 +21,9 @@ ACauldronCollisionSphereActor::ACauldronCollisionSphereActor()
 	CollisionComponent->SetCollisionProfileName(TEXT("Trigger"));
 	CollisionComponent->OnComponentBeginOverlap.AddDynamic(this, &ACauldronCollisionSphereActor::OnOverlapBegin);
 
-	// Print a string to the viewport
 
-	LOG_ERROR(TEXT("ACauldronCollisionSphereActor"),"Constructor called=%d",100);
+
+
 
 }
 
@@ -40,10 +38,7 @@ void ACauldronCollisionSphereActor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	//print position
-	//LOG_WARNING(TEXT("CauldronCollisionSphereActor"), TEXT("Fuck The police coming straight from the underground"));
-	//FString Position = GetActorLocation().ToString();
-	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, Position);
+
 }
 
 void ACauldronCollisionSphereActor::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
