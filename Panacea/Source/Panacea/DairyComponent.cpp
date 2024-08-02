@@ -39,12 +39,14 @@ void UDairyComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActor
 
 void UDairyComponent::Interact()
 {
+    UE_LOG(LogTemp, Warning, TEXT("Dairy interacted with"));
     Broadcast();
 }
 
 void UDairyComponent::Broadcast()
 {
-    OnDiaryReadDelegate.Broadcast();
+    FString name = GetOwner()->GetName();
+    OnItemInteractedDelegate.Broadcast(name);
 }
 
 //void UDairyComponent::Broadcast()

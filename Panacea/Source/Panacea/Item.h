@@ -8,7 +8,7 @@
 #include "IInteractableItem.h"
 #include "Item.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDiaryRead);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnItemInteracted, FString, ItemName);
 
 UCLASS(ABSTRACT)
 class PANACEA_API UItem : public UActorComponent, public IIInteractableItem
@@ -25,8 +25,11 @@ public:
 	UPROPERTY(EditAnywhere)
 		bool Interactable;
 
+	UPROPERTY(EditAnywhere)
+		FString InteractableTrigger;
+
 	UPROPERTY(BlueprintAssignable)
-		FOnDiaryRead OnDiaryReadDelegate;
+		FOnItemInteracted OnItemInteractedDelegate;
 
 	virtual void Broadcast() override {
 
@@ -60,6 +63,11 @@ public:
 	}
 
 	UFUNCTION()
+	virtual void CheckInteractable(FString itemInteracted) override {
+		if (itemInteracted == InteractableTrigger) {
+			SetInteractable();
+		}
+	}
 	virtual void SetInteractable() override {
 		UE_LOG(LogTemp, Warning, TEXT("Ingredient set interactable!!"));
 		Interactable = true;

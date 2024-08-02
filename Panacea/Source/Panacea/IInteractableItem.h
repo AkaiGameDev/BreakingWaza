@@ -26,6 +26,7 @@ class PANACEA_API IIInteractableItem : public IInteractable
 public:
 
 	virtual void Broadcast() = 0;
+	virtual void CheckInteractable(FString itemInteracted) = 0;
 	virtual void SetInteractable() = 0;
 	virtual void SetNotInteractable() = 0;
 };
