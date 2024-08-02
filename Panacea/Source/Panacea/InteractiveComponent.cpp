@@ -4,6 +4,7 @@
 #include "GameFramework/Actor.h"
 #include "Components/CapsuleComponent.h"
 #include "IInteractable.h"
+#include "Item.h"
 #include "Components/StaticMeshComponent.h"
 #include "DrawDebugHelpers.h"
 #include "Engine/Engine.h"
@@ -287,7 +288,7 @@ void UInteractiveComponent::Interact(const FInputActionValue& Value)
 			else
 				if (!bIsMovingToTarget)
 					Release();
-			/*Interactable->Interact();*/
+			Interactable->Interact();
 		}
 	}
 }
@@ -303,9 +304,14 @@ void UInteractiveComponent::Grab()
 			UPrimitiveComponent* ActorRootComponent = Cast<UPrimitiveComponent>(ActorInFocus->GetRootComponent());
 			if (ActorRootComponent)
 			{
-				ActorRootComponent->AttachToComponent(CameraComponent, FAttachmentTransformRules::KeepWorldTransform);
-				bIsMovingToTarget = true;
-				UE_LOG(LogTemp, Warning, TEXT("Actor in focus grabbed and moving started."));
+				if (AItem* Item = Cast<AItem>(ActorInFocus)) {
+					if (Item->Grabbable) {
+						ActorRootComponent->AttachToComponent(CameraComponent, FAttachmentTransformRules::KeepWorldTransform);
+						bIsMovingToTarget = true;
+						UE_LOG(LogTemp, Warning, TEXT("Actor in focus grabbed and moving started."));
+					}
+
+				}
 			}
 			else
 			{
