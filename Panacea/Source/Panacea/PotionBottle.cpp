@@ -18,10 +18,9 @@ void APotionBottle::BeginPlay()
 		return;
 	}
 
-	FOnItemInteracted OnItemInteractedDelegate = GameMode->OnItemInteractedDelegate;
 	// Set this actor to call Tick() every frame. You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-	OnItemInteractedDelegate.AddDynamic(this, &APotionBottle::CheckInteractable);
+	GameMode->OnItemInteractedDelegate.AddDynamic(this, &APotionBottle::CheckInteractable);
 }
 
 // Called every frame

@@ -30,8 +30,10 @@ void ADiary::Broadcast()
 		return;
 	}
 
+	FOnItemInteracted OnItemInteractedDelegate = GameMode->OnItemInteractedDelegate;
+
 	UE_LOG(LogTemp, Warning, TEXT("%s broadcasted"), *GetActorLabel());
-	GameMode->OnItemInteractedDelegate.Broadcast(GetActorLabel());
+	OnItemInteractedDelegate.Broadcast(GetActorLabel());
 }
 
 void ADiary::Interact()
