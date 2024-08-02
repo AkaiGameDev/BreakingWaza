@@ -87,9 +87,6 @@ protected:
 	/** Called for looking input */
 	void Look(const FInputActionValue& Value);
 
-	/** Called for Jumping input */
-	void Jump(const FInputActionValue& Value);
-
 	/** Called When Player Restarts Game */
 	void OnRestart();
 

@@ -16,7 +16,7 @@
 #include "MouseDragObjectsComponent.h"
 #include "InteractiveComponent.h"
 
-
+DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
 //////////////////////////////////////////////////////////////////////////
 // APanaceaCharacter
@@ -133,8 +133,8 @@ void APanaceaCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 		// Moving
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &APanaceaCharacter::Move);
 
-		// Jump action
-		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &APanaceaCharacter::Jump);
+		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ACharacter::Jump);
+		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
 
 		// Looking
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &APanaceaCharacter::Look);
@@ -195,12 +195,6 @@ void APanaceaCharacter::Look(const FInputActionValue& Value)
 		AddControllerPitchInput(LookAxisVector.Y);
 	}
 }
-
-void APanaceaCharacter::Jump(const FInputActionValue& Value)
-{
-	ACharacter::Jump();
-}
-
 
 void APanaceaCharacter::OnRestart()
 {
