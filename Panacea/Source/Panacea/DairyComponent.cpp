@@ -12,6 +12,7 @@
 UDairyComponent::UDairyComponent()
 {
     PrimaryComponentTick.bCanEverTick = true;
+    //Interactable = true;
 }
 
 // Called when the game starts
@@ -35,6 +36,21 @@ void UDairyComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActor
         PhysicsHandle->SetTargetLocation(GetReachLineEnd());
     }
 }
+
+void UDairyComponent::Interact()
+{
+    Broadcast();
+}
+
+void UDairyComponent::Broadcast()
+{
+    OnDiaryReadDelegate.Broadcast();
+}
+
+//void UDairyComponent::Broadcast()
+//{
+//    OnDiaryReadDelegate.Broadcast();
+//}
 
 void UDairyComponent::Dairy()
 {

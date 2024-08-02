@@ -1,4 +1,5 @@
 #pragma once
+#include "Item.h"
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
@@ -9,7 +10,7 @@ class UInputAction;
 class UUserWidget;
 
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
-class PANACEA_API UDairyComponent : public UActorComponent
+class PANACEA_API UDairyComponent : public UItem
 {
 	GENERATED_BODY()
 
@@ -28,6 +29,8 @@ protected:
 public:
 
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+
+	virtual void Broadcast() override;
 
 private:
 	// Physics Handle
