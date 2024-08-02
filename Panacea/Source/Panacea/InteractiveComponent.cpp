@@ -4,13 +4,13 @@
 #include "GameFramework/Actor.h"
 #include "Components/CapsuleComponent.h"
 #include "IInteractable.h"
-#include "Item.h"
 #include "Components/StaticMeshComponent.h"
 #include "DrawDebugHelpers.h"
 #include "Engine/Engine.h"
 #include "PanaceaCharacter.h"
 #include "Blueprint/UserWidget.h"
 #include "Camera/CameraComponent.h"  // Ensure this is included
+#include "Item.h"
 
 UInteractiveComponent::UInteractiveComponent()
 {
@@ -164,7 +164,7 @@ AActor* UInteractiveComponent::GetClosestToOwner(const TArray<AActor*>& ActorsTo
 
 			FCollisionQueryParams QueryParams;
 			QueryParams.AddIgnoredActor(Owner);
-			QueryParams.AddIgnoredActor(InteractableActor); // Ignore the actor itself
+			//QueryParams.AddIgnoredActor(InteractableActor); // Ignore the actor itself
 
 			// Perform the line trace
 			bool bHit = GetWorld()->LineTraceSingleByChannel(
@@ -176,7 +176,7 @@ AActor* UInteractiveComponent::GetClosestToOwner(const TArray<AActor*>& ActorsTo
 			);
 
 			// If the line trace doesn't hit anything, consider this actor
-			if (!bHit)
+			if (/*!bHit*/ HitResult.GetActor() == InteractableActor)
 			{
 				float Distance = FVector::Dist(CameraLocation, End);
 				if (Distance < ClosestDistance)
@@ -187,11 +187,13 @@ AActor* UInteractiveComponent::GetClosestToOwner(const TArray<AActor*>& ActorsTo
 			}
 
 			//// Debug drawing
-			//DrawDebugLine(GetWorld(), CameraLocation, End, FColor::Green, false, 1.0f, 0, 1.0f);
-			//if (bHit)
-			//{
-			//	DrawDebugPoint(GetWorld(), HitResult.Location, 10.0f, FColor::Red, false, 1.0f);
-			//}
+			/*DrawDebugLine(GetWorld(), CameraLocation, End, FColor::Green, false, 1.0f, 0, 1.0f);
+			if (bHit)
+			{
+				FString ActorLabel = InteractableActor->GetActorLabel();
+				UE_LOG(LogTemp, Warning, TEXT("Actor Label: %s"), *ActorLabel);
+				DrawDebugPoint(GetWorld(), HitResult.Location, 10.0f, FColor::Red, false, 1.0f);
+			}*/
 		}
 	}
 
@@ -203,21 +205,29 @@ void UInteractiveComponent::OnOverlapBegin(UPrimitiveComponent* OverlappedCompon
 {
 	if (Cast<IInteractable>(OtherActor) != nullptr)
 	{
-
 		if (bIsMovingToTarget)
 			return;
 
 		InteractableActors.AddUnique(OtherActor);
 
+
 		// Get the closest actor to the owner
 		AActor* NewActorInFocus = GetClosestToOwner(InteractableActors);
 		if (ActorInFocus != NewActorInFocus)
 		{
+
 			// Notify the old actor that it is out of range
 			if (ActorInFocusInteractableInterface)
 			{
 				ActorInFocusInteractableInterface->OnInteractableOutOfRange();
-				HintInteractionWidget->SetVisibility(ESlateVisibility::Hidden);
+
+				AItem* Item = Cast<AItem>(ActorInFocus);
+
+				if (Item && Item->Interactable)
+				{
+					HintInteractionWidget->SetVisibility(ESlateVisibility::Hidden);
+				}
+
 			}
 
 			SetActorInFocus(NewActorInFocus);
@@ -226,13 +236,18 @@ void UInteractiveComponent::OnOverlapBegin(UPrimitiveComponent* OverlappedCompon
 			if (ActorInFocusInteractableInterface)
 			{
 				ActorInFocusInteractableInterface->OnInteractableInRange();
-				HintInteractionWidget->SetVisibility(ESlateVisibility::Visible);
 
+				AItem* Item = Cast<AItem>(ActorInFocus);
+
+				if (Item && Item->Interactable)
+				{
+					HintInteractionWidget->SetVisibility(ESlateVisibility::Visible);
+				}
 			}
 		}
 	}
 
-	
+
 }
 
 void UInteractiveComponent::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
@@ -256,16 +271,28 @@ void UInteractiveComponent::OnOverlapEnd(UPrimitiveComponent* OverlappedComponen
 			if (IInteractable* OldInteractable = Cast<IInteractable>(ActorInFocus))
 			{
 				OldInteractable->OnInteractableOutOfRange();
-				HintInteractionWidget->SetVisibility(ESlateVisibility::Hidden);
+				AItem* Item = Cast<AItem>(ActorInFocus);
+
+				if (Item && Item->Interactable)
+				{
+					HintInteractionWidget->SetVisibility(ESlateVisibility::Hidden);
+				}
 			}
 
-			// Get the new closest actor to the owner
-			SetActorInFocus(GetClosestToOwner(InteractableActors));
+		}
 
-			// Notify the new actor that it is in range
-			if (IInteractable* InteractableToCast = Cast<IInteractable>(ActorInFocus))
+		// Get the new closest actor to the owner
+		SetActorInFocus(GetClosestToOwner(InteractableActors));
+
+		// Notify the new actor that it is in range
+		if (IInteractable* InteractableToCast = Cast<IInteractable>(ActorInFocus))
+		{
+			InteractableToCast->OnInteractableInRange();
+
+			AItem* Item = Cast<AItem>(ActorInFocus);
+
+			if (Item && Item->Interactable)
 			{
-				InteractableToCast->OnInteractableInRange();
 				HintInteractionWidget->SetVisibility(ESlateVisibility::Visible);
 			}
 		}
@@ -276,19 +303,24 @@ void UInteractiveComponent::Interact(const FInputActionValue& Value)
 {
 	if (ActorInFocus)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Works"));
 		if (IInteractable* Interactable = Cast<IInteractable>(ActorInFocus))
 		{
-			if (!bIsHolding)
-			{
-				UE_LOG(LogTemp, Warning, TEXT("Works"));
+			AItem* Item = Cast<AItem>(ActorInFocus);
 
-				Grab();
+			if (Item && !Item->Grabbable)
+			{
+				Interactable->Interact();
 			}
 			else
-				if (!bIsMovingToTarget)
-					Release();
-			Interactable->Interact();
+			{
+				if (!bIsHolding)
+				{
+					Grab();
+				}
+				else
+					if (!bIsMovingToTarget)
+						Release();
+			}
 		}
 	}
 }
@@ -304,14 +336,9 @@ void UInteractiveComponent::Grab()
 			UPrimitiveComponent* ActorRootComponent = Cast<UPrimitiveComponent>(ActorInFocus->GetRootComponent());
 			if (ActorRootComponent)
 			{
-				if (AItem* Item = Cast<AItem>(ActorInFocus)) {
-					if (Item->Grabbable) {
-						ActorRootComponent->AttachToComponent(CameraComponent, FAttachmentTransformRules::KeepWorldTransform);
-						bIsMovingToTarget = true;
-						UE_LOG(LogTemp, Warning, TEXT("Actor in focus grabbed and moving started."));
-					}
-
-				}
+				ActorRootComponent->AttachToComponent(CameraComponent, FAttachmentTransformRules::KeepWorldTransform);
+				bIsMovingToTarget = true;
+				UE_LOG(LogTemp, Warning, TEXT("Actor in focus grabbed and moving started."));
 			}
 			else
 			{
