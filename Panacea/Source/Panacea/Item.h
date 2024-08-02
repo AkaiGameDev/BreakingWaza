@@ -4,22 +4,22 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "IInteractable.h"
+#include "PanaceaGameMode.h"
 #include "IInteractableItem.h"
 #include "Item.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnItemInteracted, FString, ItemName);
-
 UCLASS(ABSTRACT)
-class PANACEA_API UItem : public UActorComponent, public IIInteractableItem
+class PANACEA_API AItem : public AActor, public IIInteractableItem
 {
 	GENERATED_BODY()
 	
 
 public:	
 
-	UItem() {
-
+	AItem() {
+		
 	}
 
 	UPROPERTY(EditAnywhere)
@@ -28,12 +28,26 @@ public:
 	UPROPERTY(EditAnywhere)
 		FString InteractableTrigger;
 
-	UPROPERTY(BlueprintAssignable)
-		FOnItemInteracted OnItemInteractedDelegate;
+	virtual void BeginPlay() override {
+		Super::BeginPlay();
+
+		/*APanaceaGameMode* GameMode = Cast<APanaceaGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+
+		if (!GameMode)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("GameMode is null"));
+			return;
+		}
+
+		OnItemInteractedDelegate = &GameMode->OnItemInteractedDelegate;*/
+	}
 
 	virtual void Broadcast() override {
+		
 
 	}
+
+
 
 	virtual void OnInteractableInRange() override {
 
@@ -41,7 +55,7 @@ public:
 			return;
 		}
 
-		UStaticMeshComponent* mesh = GetOwner()->GetComponentByClass<UStaticMeshComponent>();
+		UStaticMeshComponent* mesh = GetComponentByClass<UStaticMeshComponent>();
 		if (mesh) {
 			mesh->SetRenderCustomDepth(true);
 		}
@@ -52,7 +66,7 @@ public:
 			return;
 		}
 
-		UStaticMeshComponent* mesh = GetOwner()->GetComponentByClass<UStaticMeshComponent>();
+		UStaticMeshComponent* mesh = GetComponentByClass<UStaticMeshComponent>();
 		if (mesh) {
 			mesh->SetRenderCustomDepth(false);
 		}
@@ -63,7 +77,8 @@ public:
 	}
 
 	UFUNCTION()
-	virtual void CheckInteractable(FString itemInteracted) override {
+	virtual void CheckInteractable(const FString& itemInteracted) override {
+		UE_LOG(LogTemp, Warning, TEXT("Check interactable called by %s"), *itemInteracted);
 		if (itemInteracted == InteractableTrigger) {
 			SetInteractable();
 		}

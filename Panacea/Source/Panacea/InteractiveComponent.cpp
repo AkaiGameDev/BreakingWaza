@@ -130,6 +130,8 @@ void UInteractiveComponent::OnOverlapBegin(UPrimitiveComponent* OverlappedCompon
 			}
 		}
 	}
+
+	
 }
 
 void UInteractiveComponent::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
@@ -164,6 +166,7 @@ void UInteractiveComponent::Interact(const FInputActionValue& Value)
 {
 	if (ActorInFocus)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("Works"));
 		if (IInteractable* Interactable = Cast<IInteractable>(ActorInFocus))
 		{
 			/*Grab();*/

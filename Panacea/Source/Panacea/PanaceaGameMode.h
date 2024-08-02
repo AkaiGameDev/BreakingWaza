@@ -10,6 +10,8 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnIngredientAdded, const FString&, 
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnBadEnding);
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnItemInteracted, const FString&, ItemName);
+
 UCLASS(minimalapi)
 class APanaceaGameMode : public AGameModeBase
 {
@@ -23,6 +25,9 @@ public:
 	
 	UPROPERTY(BlueprintAssignable, Category = "Endings")
 	FOnBadEnding OnBadEnding;
+
+	UPROPERTY(BlueprintAssignable)
+	FOnItemInteracted OnItemInteractedDelegate;
 
 	// The widget class to use for good ending
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UI")
@@ -44,6 +49,10 @@ public:
 	UFUNCTION()
 	void RecordIngredient(const FString& IngredientName);
 
+	// Function to record the ingredient
+	UFUNCTION()
+	void RecordItemInteraction(const FString& ItemName);
+
 	// Function to start Bad ending sequence
 	UFUNCTION()
 	void OnBadEndingSequence();
@@ -58,6 +67,9 @@ private:
 	bool CheckBadEnding(const FString& IngredientName);
 	
 	TArray<FString> IngredientNames;
+
+	TArray<FString> ItemNames;
+
 };
 
 

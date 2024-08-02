@@ -15,7 +15,7 @@ APanaceaGameMode::APanaceaGameMode()
 
 	OnIngredientAdded.AddDynamic(this, &APanaceaGameMode::RecordIngredient);
 	OnBadEnding.AddDynamic(this, &APanaceaGameMode::OnBadEndingSequence);
-
+	OnItemInteractedDelegate.AddDynamic(this, &APanaceaGameMode::RecordIngredient); //change this to a new function to record items interacted w
 }
 
 void APanaceaGameMode::RecordIngredient(const FString& IngredientName)
@@ -30,6 +30,13 @@ void APanaceaGameMode::RecordIngredient(const FString& IngredientName)
 	}
 	else
 		CheckGoodEnding();
+}
+
+void APanaceaGameMode::RecordItemInteraction(const FString& ItemName)
+{
+	ItemNames.Add(ItemName);
+
+	UE_LOG(LogTemp, Warning, TEXT("Item interaction recorded: %s"), *ItemName);
 }
 
 void APanaceaGameMode::OnBadEndingSequence()
