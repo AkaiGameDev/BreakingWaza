@@ -25,8 +25,18 @@ public:
 
     void Grab();
 
+    void Release();
+
     UPROPERTY(EditAnywhere)
-    FVector GrabbedActorLocation;
+    FVector GrabbedActorLocationViewport;
+
+    UPROPERTY(EditAnywhere)
+    float MovementSpeed; // Units per second
+    
+    UPROPERTY(EditAnywhere)
+    float ReleaseDistance;
+
+
 protected:
     // Called when the game starts
     virtual void BeginPlay() override;
@@ -35,7 +45,6 @@ protected:
     virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 private:
-    UPROPERTY(VisibleAnywhere)
     APanaceaCharacter* Owner;
 
     UFUNCTION()
@@ -48,14 +57,29 @@ private:
 
     AActor* GetClosestToOwner(const TArray<AActor*>& ActorsToCheck );
 
+    bool IsPathClear(const FVector& StartLocation, const FVector& EndLocation, const FVector& BoxExtent) const;
+
+    void OnMoveItemComplete();
+
+    void SetActorInFocus(AActor* NewActorInFocus);
+
     // Capsule component for collision detection
-    UPROPERTY(VisibleAnywhere)
     UCapsuleComponent* CapsuleComponent;
 
     // List of interactable actors within range
-    UPROPERTY(VisibleAnywhere)
     TArray<AActor*> InteractableActors;
 
-    AActor* ActorInFocus = nullptr;
+    AActor* ActorInFocus;
+
+    UPrimitiveComponent* ActorInFocusRootComponent;
+
+    IInteractable* ActorInFocusInteractableInterface;
+
+    FVector TargetLocationToRelease;
+
+
+    bool bIsMovingToTarget;
+
+    bool bIsHolding;
     UUserWidget* HintInteractionWidget = nullptr;
 };

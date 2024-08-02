@@ -57,7 +57,7 @@ void UGrabbingSystemComponent::TickComponent(float DeltaTime, ELevelTick TickTyp
 
 void UGrabbingSystemComponent::Grab()
 {
-    if (!PhysicsHandle) { return; }
+    if (/*!PhysicsHandle*/ true) { return; }
 
     if (PhysicsHandle->GrabbedComponent)
     {
