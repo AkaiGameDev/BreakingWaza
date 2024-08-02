@@ -47,6 +47,9 @@ void UInteractiveComponent::BeginPlay()
 		return;
 	}
 
+	HintInteractionWidget = Owner->GetHintInteractionWidget();
+
+
 	UCameraComponent* CameraComponent = Owner->GetFirstPersonCameraComponent();
 	if (!CameraComponent)
 	{
@@ -65,6 +68,15 @@ void UInteractiveComponent::BeginPlay()
 	CapsuleComponent->AttachToComponent(RootComp, FAttachmentTransformRules::KeepRelativeTransform);
 	CapsuleComponent->SetRelativeLocation(FVector::ForwardVector * 100.0f);
 	CapsuleComponent->SetRelativeRotation(FRotator(90.0f, 0.0f, 0.0f));
+
+	if (HintInteractionWidget)
+	{
+		HintInteractionWidget->SetVisibility(ESlateVisibility::Hidden);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("HintInteractionWidget is null in InteractiveComponent::BeginPlay"));
+	}
 }
 
 void UInteractiveComponent::TickComponent(float DeltaTime, ELevelTick TickType,
