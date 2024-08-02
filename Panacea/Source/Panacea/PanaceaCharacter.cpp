@@ -135,6 +135,9 @@ void APanaceaCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 		// Moving
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &APanaceaCharacter::Move);
 
+		// Jump action
+		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &APanaceaCharacter::Jump);
+
 		// Looking
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &APanaceaCharacter::Look);
 
@@ -193,6 +196,11 @@ void APanaceaCharacter::Look(const FInputActionValue& Value)
 		AddControllerYawInput(LookAxisVector.X);
 		AddControllerPitchInput(LookAxisVector.Y);
 	}
+}
+
+void APanaceaCharacter::Jump(const FInputActionValue& Value)
+{
+	ACharacter::Jump();
 }
 
 
