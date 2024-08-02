@@ -29,7 +29,7 @@ UInteractiveComponent::UInteractiveComponent()
 void UInteractiveComponent::BeginPlay()
 {
 	Super::BeginPlay();
-
+	UE_LOG(LogTemp, Warning, TEXT("UInteractiveComponent::BeginPlay - Start"));
 	// Ensure that the Owner is set
 	Owner = Cast<APanaceaCharacter>(GetOwner());
 
@@ -37,7 +37,16 @@ void UInteractiveComponent::BeginPlay()
 	{
 		UCameraComponent* CameraComponent = Owner->GetFirstPersonCameraComponent();
 		HintInteractionWidget = Owner->GetHintInteractionWidget();
-		HintInteractionWidget->SetVisibility(ESlateVisibility::Hidden);
+
+		if (HintInteractionWidget)
+		{
+			HintInteractionWidget->SetVisibility(ESlateVisibility::Hidden);
+		}
+		else
+		{
+			UE_LOG(LogTemp, Error, TEXT("HintInteractionWidget is null in InteractiveComponent::BeginPlay"));
+		}
+
 		if (CameraComponent)
 		{
 			// Cast UCameraComponent to USceneComponent
@@ -63,6 +72,7 @@ void UInteractiveComponent::BeginPlay()
 	{
 		UE_LOG(LogTemp, Error, TEXT("Owner is null."));
 	}
+	UE_LOG(LogTemp, Warning, TEXT("UInteractiveComponent::BeginPlay - End"));
 }
 
 void UInteractiveComponent::TickComponent(float DeltaTime, ELevelTick TickType,

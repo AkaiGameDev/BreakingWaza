@@ -15,7 +15,6 @@
 #include "GrabbingSystemComponent.h"
 #include "MouseDragObjectsComponent.h"
 
-DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
 //////////////////////////////////////////////////////////////////////////
 // APanaceaCharacter
@@ -54,19 +53,25 @@ APanaceaCharacter::APanaceaCharacter()
 
 void APanaceaCharacter::BeginPlay()
 {
-	// Widget needs to be created before calling the base class BeginPlay because if the widget is not created, the widget will be null
-	// in the components BeginPlay methods and will cause a crash when trying to access the widget. So you know
-	// before changing something here.
+	UE_LOG(LogTemp, Warning, TEXT("APanaceaCharacter::BeginPlay - Start"));
 	if (CrosshairWidgetClass) // Ensure the widget class is set
 	{
-		CrosshairWidget = CreateWidget<UUserWidget>(GetWorld(), CrosshairWidgetClass);
-
-		if (CrosshairWidget)
+		if (CrosshairWidgetClass)
 		{
-			CrosshairWidget->AddToViewport(); // Adds the widget to the screen
-
-			//log that the widget was created
-			UE_LOG(LogTemp, Warning, TEXT("Crosshair widget created"));
+			CrosshairWidget = CreateWidget<UUserWidget>(GetWorld(), CrosshairWidgetClass);
+			if (CrosshairWidget)
+			{
+				CrosshairWidget->AddToViewport();
+				UE_LOG(LogTemp, Warning, TEXT("Crosshair widget created"));
+			}
+			else
+			{
+				UE_LOG(LogTemp, Error, TEXT("Failed to create Crosshair widget"));
+			}
+		}
+		else
+		{
+			UE_LOG(LogTemp, Error, TEXT("CrosshairWidgetClass is null"));
 		}
 	}
 
@@ -77,29 +82,53 @@ void APanaceaCharacter::BeginPlay()
 		if (HintInteractionWidget)
 		{
 			HintInteractionWidget->AddToViewport();
-
 			UE_LOG(LogTemp, Warning, TEXT("Hint Interaction widget created"));
 		}
+		else
+		{
+			UE_LOG(LogTemp, Error, TEXT("Failed to create Hint Interaction widget"));
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("HintInteractionWidgetClass is null"));
 	}
 
 	// Call the base class  
 	Super::BeginPlay();
 
 	// Add Input Mapping Context
-	if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
+	if (const APlayerController* PlayerController = Cast<APlayerController>(Controller))
 	{
 		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<
 			UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
 		{
 			Subsystem->AddMappingContext(DefaultMappingContext, 0);
 		}
+		else
+		{
+			UE_LOG(LogTemp, Error, TEXT("Failed to get Enhanced Input Local Player Subsystem"));
+		}
 	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("Controller is not a PlayerController"));
+	}
+
+	UE_LOG(LogTemp, Warning, TEXT("APanaceaCharacter::BeginPlay - End"));
 }
 
 //////////////////////////////////////////////////////////////////////////// Input
 
 void APanaceaCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
+
+	if (!PlayerInputComponent)
+	{
+		UE_LOG(LogTemp, Error, TEXT("PlayerInputComponent is null"));
+		return;
+	}
+
 	// Set up action bindings
 	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent))
 	{
