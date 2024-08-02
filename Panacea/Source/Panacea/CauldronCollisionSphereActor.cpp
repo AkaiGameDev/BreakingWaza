@@ -2,6 +2,7 @@
 
 
 #include "CauldronCollisionSphereActor.h"
+
 #include "Engine/Engine.h"
 #include "PanaceaGameMode.h"
 #include "Kismet/GameplayStatics.h"
@@ -20,18 +21,16 @@ ACauldronCollisionSphereActor::ACauldronCollisionSphereActor()
 	CollisionComponent->SetCollisionProfileName(TEXT("Trigger"));
 	CollisionComponent->OnComponentBeginOverlap.AddDynamic(this, &ACauldronCollisionSphereActor::OnOverlapBegin);
 
-	// Print a string to the viewport
-	if (GEngine)
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("Cauldron Collider Sphere Created!"));
-	}
+
+
+
+
 }
 
 // Called when the game starts or when spawned
 void ACauldronCollisionSphereActor::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
 // Called every frame
@@ -39,15 +38,12 @@ void ACauldronCollisionSphereActor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	//print position
-
-	//FString Position = GetActorLocation().ToString();
-	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, Position);
 
 }
 
 void ACauldronCollisionSphereActor::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
-	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+                                                   UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
+                                                   bool bFromSweep, const FHitResult& SweepResult)
 {
 	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, TEXT("Something collided with the cauldron!"));
 
@@ -62,11 +58,10 @@ void ACauldronCollisionSphereActor::OnOverlapBegin(UPrimitiveComponent* Overlapp
 		FTimerHandle TimerHandle;
 
 		GetWorldTimerManager().SetTimer(TimerHandle, [this, OtherActor]()
-			{
-				OnIngredientAdded(OtherActor);
-			}, 1.0f, false);
+		{
+			OnIngredientAdded(OtherActor);
+		}, 1.0f, false);
 	}
-
 }
 
 
@@ -80,4 +75,3 @@ void ACauldronCollisionSphereActor::OnIngredientAdded(AActor* Ingredient)
 
 	Ingredient->Destroy();
 }
-

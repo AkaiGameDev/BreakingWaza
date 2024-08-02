@@ -14,6 +14,7 @@
 #include "Blueprint/UserWidget.h"
 #include "GrabbingSystemComponent.h"
 #include "MouseDragObjectsComponent.h"
+#include "InteractiveComponent.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -43,52 +44,97 @@ APanaceaCharacter::APanaceaCharacter()
 	MouseDragObjectsComponent = CreateDefaultSubobject<UMouseDragObjectsComponent>(TEXT("MouseDragObjectsComponent"));
 	MouseDragObjectsComponent->SetInitilizeReferences();
 
-	GrabbingSystemComponent = CreateDefaultSubobject<UGrabbingSystemComponent>(TEXT("GrabbingSystemComponent"));
+	// Create an InteractiveComponent
+	InteractiveComponent = CreateDefaultSubobject<UInteractiveComponent>(TEXT("InteractiveComponent"));
 
-	PhysicsHandleComponent = CreateDefaultSubobject<UPhysicsHandleComponent>(TEXT("PhysicsHandleComponent"));
 }
 
 void APanaceaCharacter::BeginPlay()
 {
-	// Widget needs to be created before calling the base class BeginPlay because if the widget is not created, the widget will be null
-	// in the components BeginPlay methods and will cause a crash when trying to access the widget. So you know
-	// before changing something here.
+	UE_LOG(LogTemp, Warning, TEXT("APanaceaCharacter::BeginPlay - Start"));
 	if (CrosshairWidgetClass) // Ensure the widget class is set
 	{
-		CrosshairWidget = CreateWidget<UUserWidget>(GetWorld(), CrosshairWidgetClass);
-
-		if (CrosshairWidget)
+		if (CrosshairWidgetClass)
 		{
-			CrosshairWidget->AddToViewport(); // Adds the widget to the screen
-
-			//log that the widget was created
-			UE_LOG(LogTemp, Warning, TEXT("Crosshair widget created"));
+			CrosshairWidget = CreateWidget<UUserWidget>(GetWorld(), CrosshairWidgetClass);
+			if (CrosshairWidget)
+			{
+				CrosshairWidget->AddToViewport();
+				UE_LOG(LogTemp, Warning, TEXT("Crosshair widget created"));
+			}
+			else
+			{
+				UE_LOG(LogTemp, Error, TEXT("Failed to create Crosshair widget"));
+			}
 		}
+		else
+		{
+			UE_LOG(LogTemp, Error, TEXT("CrosshairWidgetClass is null"));
+		}
+	}
+
+	if (HintInteractionWidgetClass)
+	{
+		HintInteractionWidget = CreateWidget<UUserWidget>(GetWorld(), HintInteractionWidgetClass);
+
+		if (HintInteractionWidget)
+		{
+			HintInteractionWidget->AddToViewport();
+			UE_LOG(LogTemp, Warning, TEXT("Hint Interaction widget created"));
+		}
+		else
+		{
+			UE_LOG(LogTemp, Error, TEXT("Failed to create Hint Interaction widget"));
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("HintInteractionWidgetClass is null"));
 	}
 
 	// Call the base class  
 	Super::BeginPlay();
 
 	// Add Input Mapping Context
-	if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
+	if (const APlayerController* PlayerController = Cast<APlayerController>(Controller))
 	{
 		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<
 			UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
 		{
 			Subsystem->AddMappingContext(DefaultMappingContext, 0);
 		}
+		else
+		{
+			UE_LOG(LogTemp, Error, TEXT("Failed to get Enhanced Input Local Player Subsystem"));
+		}
 	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("Controller is not a PlayerController"));
+	}
+
+	UE_LOG(LogTemp, Warning, TEXT("APanaceaCharacter::BeginPlay - End"));
 }
 
 //////////////////////////////////////////////////////////////////////////// Input
 
 void APanaceaCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
+
+	if (!PlayerInputComponent)
+	{
+		UE_LOG(LogTemp, Error, TEXT("PlayerInputComponent is null"));
+		return;
+	}
+
 	// Set up action bindings
 	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent))
 	{
 		// Moving
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &APanaceaCharacter::Move);
+
+		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ACharacter::Jump);
+		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
 
 		// Looking
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &APanaceaCharacter::Look);
@@ -115,8 +161,12 @@ void APanaceaCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 
 UUserWidget* APanaceaCharacter::GetCrosshairWidget() const
 {
-	UE_LOG(LogTemp, Warning, TEXT("Geting Crosshair Widget"));
 	return CrosshairWidget;
+}
+
+UUserWidget* APanaceaCharacter::GetHintInteractionWidget() const
+{
+	return HintInteractionWidget;
 }
 
 
@@ -146,7 +196,6 @@ void APanaceaCharacter::Look(const FInputActionValue& Value)
 	}
 }
 
-
 void APanaceaCharacter::OnRestart()
 {
 	UGameplayStatics::OpenLevel(this, FName(*GetWorld()->GetName()), false);
@@ -159,47 +208,6 @@ void APanaceaCharacter::Pause()
 
 void APanaceaCharacter::Interact(const FInputActionValue& Value)
 {
-	FVector Start;
-	FRotator Rotation;
-	FVector End;
-	FHitResult HitResult;
-
-	APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
-	if (PlayerController)
-	{
-		PlayerController->GetPlayerViewPoint(Start, Rotation);
-		End = Start + (Rotation.Vector() * 500.0f);
-		FCollisionQueryParams CollisionParams;
-		CollisionParams.AddIgnoredActor(this);
-
-		// Draw the debug line from Start to End
-		DrawDebugLine(GetWorld(), Start, End, FColor::Green, false, 1, 0, 1);
-
-
-		if (GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_Visibility, CollisionParams))
-		{
-			AActor* HitActor = HitResult.GetActor();
-			if (HitActor)
-			{
-				// Draw a debug sphere at the hit location
-				DrawDebugSphere(GetWorld(), HitResult.Location, 10.0f, 12, FColor::Red, false, 1);
-
-				IInteractable* Interactable = Cast<IInteractable>(HitActor);
-				if (Interactable)
-				{
-					Interactable->Interact();
-					GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, TEXT("Interacted!"));
-				}
-				else
-				{
-					GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow,
-					                                 TEXT("Hit Actor does not implement IInteractable!"));
-				}
-			}
-		}
-		else
-		{
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, TEXT("No Interactable Object Found!"));
-		}
-	}
+	if (InteractiveComponent)
+		InteractiveComponent->Interact(Value);
 }

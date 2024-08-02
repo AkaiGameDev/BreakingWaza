@@ -20,15 +20,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* GrabAction;
 
-
-
-
-
 protected:
 	virtual void BeginPlay() override;
-
-
-
 
 public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType,
@@ -45,8 +38,6 @@ private:
 
 	// Ray-cast and grab what's in reach
 	void Grab();
-
-	void Freeze();
 
 	// Called when grab is released
 	//void Release();
@@ -69,7 +60,7 @@ private:
 
 	// How far ahead of the player can we reach in cm
 	UPROPERTY(EditAnywhere)
-	float Reach = 200.f;
+	float Reach = 400.f;
 
 	// Crosshair
 	UUserWidget* Crosshair;

@@ -2,11 +2,9 @@
 
 #pragma once
 
-
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Logging/LogMacros.h"
-#include "IInteractable.h"
 #include "PanaceaCharacter.generated.h"
 
 
@@ -18,6 +16,7 @@ class UInputMappingContext;
 class UMouseDragObjectsComponent;
 class UGrabbingSystemComponent;
 class UPhysicsHandleComponent;
+class UInteractiveComponent;
 struct FInputActionValue;
 
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
@@ -34,18 +33,18 @@ class APanaceaCharacter : public ACharacter
 	/** First person camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	UCameraComponent* FirstPersonCameraComponent;
-	
+
 	/** Component for Draging objects by mouse */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly,  meta = (AllowPrivateAccess = "true"))
 	UMouseDragObjectsComponent* MouseDragObjectsComponent;
 
-	/** Component for grabbing objects */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-	UGrabbingSystemComponent* GrabbingSystemComponent;
-
 	/** Component for physic handling*/
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly,  meta = (AllowPrivateAccess = "true"))
 	UPhysicsHandleComponent* PhysicsHandleComponent;
+
+	/** Component for handling interaction */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly,meta = (AllowPrivateAccess = "true"))
+	UInteractiveComponent* InteractiveComponent;
 
 	/** MappingContext */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
@@ -54,6 +53,10 @@ class APanaceaCharacter : public ACharacter
 	/** Move Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
 	UInputAction* MoveAction;
+
+	/** Jump Input Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
+	UInputAction* JumpAction;
 
 	/** Look Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
@@ -70,17 +73,12 @@ class APanaceaCharacter : public ACharacter
 	/** Interact Input Action */
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	UInputAction* InteractAction;
-
-
-
 	
 public:
 	APanaceaCharacter();
 
-
-
 protected:
-	virtual void BeginPlay();
+	virtual void BeginPlay() override;
 
 protected:
 	/** Called for movement input */
@@ -91,7 +89,7 @@ protected:
 
 	/** Called When Player Restarts Game */
 	void OnRestart();
-	
+
 	/** Called When Player pauses Game */
 	void Pause();
 
@@ -100,7 +98,11 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
 	TSubclassOf<UUserWidget> CrosshairWidgetClass;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
+	TSubclassOf<UUserWidget> HintInteractionWidgetClass;
+
 	UUserWidget* CrosshairWidget;
+	UUserWidget* HintInteractionWidget;
 
 	// APawn interface
 	virtual void SetupPlayerInputComponent(UInputComponent* InputComponent) override;
@@ -115,5 +117,5 @@ public:
 	UInputMappingContext* GetDefaultMappingContext() const { return DefaultMappingContext; }
 
 	UUserWidget* GetCrosshairWidget() const;
+	UUserWidget* GetHintInteractionWidget() const;
 };
-

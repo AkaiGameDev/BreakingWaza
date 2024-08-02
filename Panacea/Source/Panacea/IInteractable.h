@@ -16,11 +16,13 @@ class UInteractable : public UInterface
 /**
  * 
  */
-class PANACEA_API IInteractable
+class PANACEA_API IInteractable : public IInterface
 {
 	GENERATED_BODY()
 
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
 	virtual void Interact() = 0;
+	virtual void OnInteractableInRange() = 0;
+	virtual void OnInteractableOutOfRange() = 0;
 };
