@@ -31,7 +31,11 @@ public:
     FVector GrabbedActorLocationViewport;
 
     UPROPERTY(EditAnywhere)
-    float MovementSpeed = 20.0f; // Units per second
+    float MovementSpeed; // Units per second
+    
+    UPROPERTY(EditAnywhere)
+    float ReleaseDistance;
+
 
 protected:
     // Called when the game starts
@@ -65,13 +69,16 @@ private:
     // List of interactable actors within range
     TArray<AActor*> InteractableActors;
 
-    AActor* ActorInFocus = nullptr;
+    AActor* ActorInFocus;
 
     UPrimitiveComponent* ActorInFocusRootComponent;
 
+    IInteractable* ActorInFocusInteractableInterface;
+
     FVector TargetLocationToRelease;
 
-    bool bIsMovingToTarget = false;
+
+    bool bIsMovingToTarget;
 
     bool bIsHolding;
 };

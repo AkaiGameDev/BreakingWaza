@@ -15,6 +15,12 @@ UInteractiveComponent::UInteractiveComponent()
 	PrimaryComponentTick.bCanEverTick = true;
 
 	bIsHolding = false;
+	bIsMovingToTarget = false;
+
+	GrabbedActorLocationViewport = FVector(70.0f, 30.0f, -30.0f);
+
+	MovementSpeed = 20.0f; // Units per second
+	ReleaseDistance = 300.0f;
 
 	// Create and initialize the capsule component
 	CapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>(TEXT("CapsuleComponent"));
@@ -181,32 +187,30 @@ void UInteractiveComponent::OnOverlapBegin(UPrimitiveComponent* OverlappedCompon
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
 	const FHitResult& SweepResult)
 {
-
-
 	if (Cast<IInteractable>(OtherActor) != nullptr)
 	{
-		InteractableActors.AddUnique(OtherActor);
 
-		if (bIsHolding)
+		if (bIsMovingToTarget)
 			return;
 
+		InteractableActors.AddUnique(OtherActor);
 
 		// Get the closest actor to the owner
 		AActor* NewActorInFocus = GetClosestToOwner(InteractableActors);
 		if (ActorInFocus != NewActorInFocus)
 		{
 			// Notify the old actor that it is out of range
-			if (IInteractable* OldInteractable = Cast<IInteractable>(ActorInFocus))
+			if (ActorInFocusInteractableInterface)
 			{
-				OldInteractable->OnInteractableOutOfRange();
+				ActorInFocusInteractableInterface->OnInteractableOutOfRange();
 			}
 
 			SetActorInFocus(NewActorInFocus);
 
 			// Notify the new actor that it is in range
-			if (IInteractable* NewInteractable = Cast<IInteractable>(ActorInFocus))
+			if (ActorInFocusInteractableInterface)
 			{
-				NewInteractable->OnInteractableInRange();
+				ActorInFocusInteractableInterface->OnInteractableInRange();
 			}
 		}
 	}
@@ -219,10 +223,12 @@ void UInteractiveComponent::OnOverlapEnd(UPrimitiveComponent* OverlappedComponen
 	if (IInteractable* Interactable = Cast<IInteractable>(OtherActor))
 	{
 
+		if (bIsMovingToTarget)
+			return;
+
+
 		InteractableActors.Remove(OtherActor);
 
-		if (bIsHolding)
-			return;
 
 
 		// If the actor going out of range was in focus, update the focus
@@ -301,7 +307,6 @@ void UInteractiveComponent::Release()
 		{
 			FVector CameraLocation = CameraComponent->GetComponentLocation();
 			FVector CameraForward = CameraComponent->GetForwardVector();
-			float TraceDistance = 500.0f; // Define how far you want to trace for placing the object
 
 			FVector BoxExtent(10.0f, 10.0f, 10.0f); // Define default the box extent for collision checking
 
@@ -310,10 +315,12 @@ void UInteractiveComponent::Release()
 			{
 				FVector Origin, BoxBounds;
 				MeshComponent->GetLocalBounds(Origin, BoxBounds);
-				BoxExtent = BoxBounds * 0.5f; // Half size to get the box extent
+				FVector ActorScale = MeshComponent->GetComponentScale();
+				BoxExtent = BoxBounds * ActorScale; // Half size to get the box extent
+
 			}
 
-			FVector TraceEnd = CameraLocation + (CameraForward * TraceDistance);
+			FVector TraceEnd = CameraLocation + (CameraForward * ReleaseDistance);
 
 			FCollisionQueryParams QueryParams;
 			QueryParams.AddIgnoredActor(ActorInFocus);
@@ -336,16 +343,22 @@ void UInteractiveComponent::Release()
 			//	DrawDebugPoint(GetWorld(), HitResult.Location, 10.0f, FColor::Red, false, 1.0f);
 			//}
 
-			if (IsPathClear(CameraLocation, HitResult.ImpactPoint + FVector::UpVector * (BoxExtent.X + 1), BoxExtent))
+			if (!bHit)
+			{
+				UE_LOG(LogTemp, Log, TEXT("Place to put object is not found."));
+				return;
+			}
+
+			TargetLocationToRelease = HitResult.ImpactPoint + FVector::UpVector * (BoxExtent.X + 0.05f);
+
+			if (IsPathClear(CameraLocation, TargetLocationToRelease, BoxExtent))
 			{
 				// Smoothly move the object to the target location
-				UPrimitiveComponent* ActorRootComponent = Cast<UPrimitiveComponent>(ActorInFocus->GetRootComponent());
-				if (ActorRootComponent)
+				if (ActorInFocusRootComponent)
 				{
-					ActorRootComponent->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
+					ActorInFocusRootComponent->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
 				}
 
-				TargetLocationToRelease = HitResult.ImpactPoint + FVector::UpVector * BoxExtent.X;
 				bIsMovingToTarget = true;
 
 			}
@@ -382,9 +395,9 @@ bool UInteractiveComponent::IsPathClear(const FVector& StartLocation, const FVec
 		QueryParams
 	);
 
-	/*DrawDebugBox(GetWorld(), StartLocation, BoxExtent, FColor::Red, false, 1.0f);
+	DrawDebugBox(GetWorld(), StartLocation, BoxExtent, FColor::Red, false, 1.0f);
 	DrawDebugBox(GetWorld(), EndLocation, BoxExtent, FColor::Green, false, 1.0f);
-	DrawDebugLine(GetWorld(), StartLocation, EndLocation, FColor::Blue, false, 1.0f, 0, 1.0f);*/
+	DrawDebugLine(GetWorld(), StartLocation, EndLocation, FColor::Blue, false, 1.0f, 0, 1.0f);
 
 	if (HitResult.bBlockingHit)
 		DrawDebugPoint(GetWorld(), HitResult.ImpactPoint, 10.0f, FColor::Red, false, 4.0f);
@@ -402,33 +415,32 @@ void UInteractiveComponent::OnMoveItemComplete()
 			UCameraComponent* CameraComponent = Owner->GetFirstPersonCameraComponent();
 			if (CameraComponent)
 			{
-				UPrimitiveComponent* ActorRootComponent = Cast<UPrimitiveComponent>(ActorInFocus->GetRootComponent());
-				if (ActorRootComponent)
+				if (ActorInFocusRootComponent)
 				{
-					ActorRootComponent->AttachToComponent(CameraComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+					ActorInFocusRootComponent->AttachToComponent(CameraComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 
 
-					if (IInteractable* OldInteractable = Cast<IInteractable>(ActorInFocus))
+					if (ActorInFocusInteractableInterface)
 					{
-						OldInteractable->OnInteractableOutOfRange();
+						ActorInFocusInteractableInterface->OnInteractableOutOfRange();
 					}
 				}
 			}
 		}
 		else
 		{
-			if (IInteractable* OldInteractable = Cast<IInteractable>(ActorInFocus))
+			if (ActorInFocusInteractableInterface)
 			{
-				OldInteractable->OnInteractableOutOfRange();
+				ActorInFocusInteractableInterface->OnInteractableOutOfRange();
 			}
 
 			// Get the new closest actor to the owner
 			SetActorInFocus(GetClosestToOwner(InteractableActors));
 
 			// Notify the new actor that it is in range
-			if (IInteractable* InteractableToCast = Cast<IInteractable>(ActorInFocus))
+			if (ActorInFocusInteractableInterface)
 			{
-				InteractableToCast->OnInteractableInRange();
+				ActorInFocusInteractableInterface->OnInteractableInRange();
 			}
 
 
@@ -443,9 +455,11 @@ void UInteractiveComponent::SetActorInFocus(AActor* NewActorInFocus)
 	if (ActorInFocus)
 	{
 		ActorInFocusRootComponent = Cast<UPrimitiveComponent>(ActorInFocus->GetRootComponent());
+		ActorInFocusInteractableInterface = Cast<IInteractable>(ActorInFocus);
 	}
 	else
 	{
+		ActorInFocusInteractableInterface = nullptr;
 		ActorInFocusRootComponent = nullptr;
 	}
 }
