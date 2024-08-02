@@ -25,8 +25,8 @@ USwitchComponent::USwitchComponent()
 		}
 	}
 
-	ObjectCamera->SetRelativeLocation(FVector(400.f, 400.f, 400.f)); // Adjust as needed
-	ObjectCamera->SetRelativeRotation(FRotator(-30.f, 0.f, 0.f)); // Adjust as needed
+	ObjectCamera->SetRelativeLocation(FVector(-78.f, 10.f, 160.f)); // Adjust as needed
+	ObjectCamera->SetRelativeRotation(FRotator(-60.f, 0.f, 0.f)); // Adjust as needed
 
 	OriginalViewTarget = nullptr;
 }

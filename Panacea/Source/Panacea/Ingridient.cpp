@@ -31,12 +31,29 @@ void AIngridient::BeginPlay()
 {
 	Super::BeginPlay();
 
-	TArray<UStaticMeshComponent*> Meshes;
-	GetComponents<UStaticMeshComponent>(Meshes);
-	if (Meshes.Num() > 0)
+	// Ensure StaticMeshComponent is initialized
+	if (StaticMeshComponent)
 	{
-		StaticMeshComponent = Meshes[0];
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Mesh Found: ") + GetActorLabel());
+		TArray<USceneComponent*> ChildComponents;
+		StaticMeshComponent->GetChildrenComponents(true, ChildComponents);
+
+		for (USceneComponent* Child : ChildComponents)
+		{
+			// Check if the child is a UStaticMeshComponent
+			UStaticMeshComponent* ChildMesh = Cast<UStaticMeshComponent>(Child);
+			if (ChildMesh)
+			{
+				// Log the name of the found mesh
+				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Child Mesh Found: ") + ChildMesh->GetName());
+				StaticMeshComponent = ChildMesh;
+				break; // Exit the loop after finding the first child mesh
+			}
+		}
+	}
+
+	if (!StaticMeshComponent)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("No child StaticMeshComponent found"));
 	}
 
 
