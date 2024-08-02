@@ -6,7 +6,6 @@
 #include "PanaceaCharacter.h"
 #include "Components/InputComponent.h"
 #include <EnhancedInputComponent.h>
-#include "PhysicsEngine/PhysicsHandleComponent.h"
 
 // Sets default values for this component's properties
 UGrabbingSystemComponent::UGrabbingSystemComponent()
@@ -57,31 +56,18 @@ void UGrabbingSystemComponent::TickComponent(float DeltaTime, ELevelTick TickTyp
 
 void UGrabbingSystemComponent::Grab()
 {
-    if (/*!PhysicsHandle*/ true) { return; }
+    if (!PhysicsHandle) { return; }
 
     if (PhysicsHandle->GrabbedComponent)
     {
         // If we're currently grabbing something, release it
         UE_LOG(LogTemp, Warning, TEXT("Grab released"));
-
-        // Disable CCD
-        PhysicsHandle->GrabbedComponent->SetAllPhysicsLinearVelocity(FVector::ZeroVector);
-        PhysicsHandle->GrabbedComponent->SetAllPhysicsAngularVelocityInDegrees(FVector::ZeroVector);
-        PhysicsHandle->GrabbedComponent->SetEnableGravity(true);
-        PhysicsHandle->GrabbedComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-
-        UPrimitiveComponent* GrabbedComponent = PhysicsHandle->GrabbedComponent;
-        if (GrabbedComponent)
-        {
-            GrabbedComponent->SetUseCCD(false);
-        }
-
         PhysicsHandle->ReleaseComponent();
         Crosshair->SetVisibility(ESlateVisibility::Visible);
     }
     else
     {
-
+        Crosshair->SetVisibility(ESlateVisibility::Hidden);
         // LINE TRACE and see if we reach any actors with physics body collision channel set
         UE_LOG(LogTemp, Warning, TEXT("Grab pressed"));
         auto HitResult = GetFirstPhysicsBodyInReach();
@@ -96,10 +82,10 @@ void UGrabbingSystemComponent::Grab()
                 NAME_None, // no bones needed
                 ComponentToGrab->GetOwner()->GetActorLocation()
             );
-            Crosshair->SetVisibility(ESlateVisibility::Hidden);
         }
     }
 }
+
 
 void UGrabbingSystemComponent::FindPhysicsHandle()
 {
