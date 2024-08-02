@@ -28,6 +28,10 @@ public:
 	UPROPERTY(EditAnywhere)
 		FString InteractableTrigger;
 
+	//Flag that controls whether the player can pick up the item
+	UPROPERTY(EditAnywhere)
+		bool Grabbable;
+
 	virtual void BeginPlay() override {
 		Super::BeginPlay();
 
@@ -78,7 +82,7 @@ public:
 
 	UFUNCTION()
 	virtual void CheckInteractable(const FString& itemInteracted) override {
-		UE_LOG(LogTemp, Warning, TEXT("Check interactable called by %s"), *itemInteracted);
+		UE_LOG(LogTemp, Warning, TEXT("Check interactable called by"), *itemInteracted);
 		if (itemInteracted == InteractableTrigger) {
 			SetInteractable();
 		}
