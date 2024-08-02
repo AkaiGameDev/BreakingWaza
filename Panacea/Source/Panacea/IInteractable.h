@@ -16,7 +16,7 @@ class UInteractable : public UInterface
 /**
  * 
  */
-class PANACEA_API IInteractable
+class PANACEA_API IInteractable : public IInterface
 {
 	GENERATED_BODY()
 
