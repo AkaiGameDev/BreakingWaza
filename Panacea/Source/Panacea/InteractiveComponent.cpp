@@ -67,19 +67,44 @@ void UInteractiveComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 
 	/*DrawDebugCapsuleVisualization();*/
 
-	if (bIsMovingToTarget && ActorInFocus && ActorInFocusRootComponent)
-	{
-		FVector CurrentLocation = ActorInFocusRootComponent->GetRelativeLocation();
-		FVector NewLocation = FMath::VInterpTo(CurrentLocation, GrabbedActorLocationViewport, DeltaTime, MovementSpeed);
-		ActorInFocusRootComponent->SetRelativeLocation(NewLocation);
+	if (bIsMovingToTarget && ActorInFocus && ActorInFocusRootComponent) {
 
-		if (FVector::Dist(CurrentLocation, GrabbedActorLocationViewport) < 1.0f)
+		FVector CurrentLocation;
+		FRotator CurrentRotation;
+
+		FVector DesiredLocation = bIsHolding ? TargetLocationToRelease : GrabbedActorLocationViewport;
+		FRotator DesiredRotation = bIsHolding ? FRotator(0.0f, CurrentRotation.Yaw, CurrentRotation.Roll) : FRotator::ZeroRotator;
+
+		if (!bIsHolding)
+		{
+			CurrentLocation = ActorInFocusRootComponent->GetRelativeLocation();
+			FVector NewLocation = FMath::VInterpTo(CurrentLocation, DesiredLocation, DeltaTime, MovementSpeed);
+			ActorInFocusRootComponent->SetRelativeLocation(NewLocation);
+
+			CurrentRotation = ActorInFocusRootComponent->GetRelativeRotation();
+			FRotator NewRotation = FMath::RInterpTo(CurrentRotation, DesiredRotation, DeltaTime, MovementSpeed);
+			ActorInFocusRootComponent->SetRelativeRotation(NewRotation);
+		}
+		else
+		{
+			CurrentLocation = ActorInFocusRootComponent->GetComponentLocation();
+			FVector NewLocation = FMath::VInterpTo(CurrentLocation, DesiredLocation, DeltaTime, MovementSpeed);
+			ActorInFocusRootComponent->SetWorldLocation(NewLocation);
+
+			CurrentRotation = ActorInFocusRootComponent->GetComponentRotation();
+			FRotator NewRotation = FMath::RInterpTo(CurrentRotation, DesiredRotation, DeltaTime, MovementSpeed);
+			ActorInFocusRootComponent->SetWorldRotation(NewRotation);
+		}
+
+		if (FVector::Dist(CurrentLocation, DesiredLocation) < 1.0f &&
+			FQuat::Slerp(CurrentRotation.Quaternion(), DesiredRotation.Quaternion(), DeltaTime * MovementSpeed).Equals(DesiredRotation.Quaternion(), 1.0f))
 		{
 			bIsMovingToTarget = false;
 			UE_LOG(LogTemp, Warning, TEXT("Actor in focus reached target location."));
 			OnMoveItemComplete();
 		}
 	}
+
 }
 
 void UInteractiveComponent::DrawDebugCapsuleVisualization() const
@@ -99,23 +124,59 @@ AActor* UInteractiveComponent::GetClosestToOwner(const TArray<AActor*>& ActorsTo
 	AActor* ClosestActor = nullptr;
 	float ClosestDistance = FLT_MAX;
 
+	// Get the camera component from the owner
+	UCameraComponent* CameraComponent = Owner->GetFirstPersonCameraComponent();
+	if (!CameraComponent)
+	{
+		UE_LOG(LogTemp, Error, TEXT("Camera component is null."));
+		return nullptr;
+	}
+
+	FVector CameraLocation = CameraComponent->GetComponentLocation();
+
 	// Iterate through the list of actors to find the closest one
 	for (AActor* InteractableActor : ActorsToCheck)
 	{
 		if (InteractableActor)
 		{
-			float Distance = FVector::Dist(Owner->GetActorLocation(), InteractableActor->GetActorLocation());
-			if (Distance < ClosestDistance)
+			FVector End = InteractableActor->GetActorLocation();
+			FHitResult HitResult;
+
+			FCollisionQueryParams QueryParams;
+			QueryParams.AddIgnoredActor(Owner);
+			QueryParams.AddIgnoredActor(InteractableActor); // Ignore the actor itself
+
+			// Perform the line trace
+			bool bHit = GetWorld()->LineTraceSingleByChannel(
+				HitResult,
+				CameraLocation,
+				End,
+				ECC_Visibility,
+				QueryParams
+			);
+
+			// If the line trace doesn't hit anything, consider this actor
+			if (!bHit)
 			{
-				ClosestDistance = Distance;
-				ClosestActor = InteractableActor;
+				float Distance = FVector::Dist(CameraLocation, End);
+				if (Distance < ClosestDistance)
+				{
+					ClosestDistance = Distance;
+					ClosestActor = InteractableActor;
+				}
 			}
+
+			//// Debug drawing
+			//DrawDebugLine(GetWorld(), CameraLocation, End, FColor::Green, false, 1.0f, 0, 1.0f);
+			//if (bHit)
+			//{
+			//	DrawDebugPoint(GetWorld(), HitResult.Location, 10.0f, FColor::Red, false, 1.0f);
+			//}
 		}
 	}
 
 	return ClosestActor;
 }
-
 void UInteractiveComponent::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
 	const FHitResult& SweepResult)
@@ -186,12 +247,19 @@ void UInteractiveComponent::OnOverlapEnd(UPrimitiveComponent* OverlappedComponen
 
 void UInteractiveComponent::Interact(const FInputActionValue& Value)
 {
-	if (!bIsHolding && ActorInFocus)
+	if (ActorInFocus)
 	{
 		if (IInteractable* Interactable = Cast<IInteractable>(ActorInFocus))
 		{
+			if (!bIsHolding)
+			{
+				UE_LOG(LogTemp, Warning, TEXT("Works"));
 
-			Grab();
+				Grab();
+			}
+			else
+				if (!bIsMovingToTarget)
+					Release();
 			/*Interactable->Interact();*/
 		}
 	}
@@ -201,13 +269,9 @@ void UInteractiveComponent::Grab()
 {
 	if (Owner && ActorInFocus)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Works1"));
-
 		UCameraComponent* CameraComponent = Owner->GetFirstPersonCameraComponent();
 		if (CameraComponent)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Works2"));
-
 			// Attach the root component of the actor in focus to the camera component
 			UPrimitiveComponent* ActorRootComponent = Cast<UPrimitiveComponent>(ActorInFocus->GetRootComponent());
 			if (ActorRootComponent)
@@ -219,6 +283,75 @@ void UInteractiveComponent::Grab()
 			else
 			{
 				UE_LOG(LogTemp, Error, TEXT("Actor in focus root component is null."));
+			}
+		}
+		else
+		{
+			UE_LOG(LogTemp, Error, TEXT("Camera component is null."));
+		}
+	}
+}
+
+void UInteractiveComponent::Release()
+{
+	if (Owner && ActorInFocus && bIsHolding)
+	{
+		UCameraComponent* CameraComponent = Owner->GetFirstPersonCameraComponent();
+		if (CameraComponent)
+		{
+			FVector CameraLocation = CameraComponent->GetComponentLocation();
+			FVector CameraForward = CameraComponent->GetForwardVector();
+			float TraceDistance = 500.0f; // Define how far you want to trace for placing the object
+
+			FVector BoxExtent(10.0f, 10.0f, 10.0f); // Define default the box extent for collision checking
+
+			UStaticMeshComponent* MeshComponent = ActorInFocus->FindComponentByClass<UStaticMeshComponent>();
+			if (MeshComponent)
+			{
+				FVector Origin, BoxBounds;
+				MeshComponent->GetLocalBounds(Origin, BoxBounds);
+				BoxExtent = BoxBounds * 0.5f; // Half size to get the box extent
+			}
+
+			FVector TraceEnd = CameraLocation + (CameraForward * TraceDistance);
+
+			FCollisionQueryParams QueryParams;
+			QueryParams.AddIgnoredActor(ActorInFocus);
+			QueryParams.AddIgnoredActor(Owner);
+
+			FHitResult HitResult;
+
+			bool bHit = GetWorld()->LineTraceSingleByChannel(
+				HitResult,
+				CameraLocation,
+				TraceEnd,
+				ECC_Visibility,
+				QueryParams
+			);
+
+			//// Debug drawing
+			//DrawDebugLine(GetWorld(), CameraLocation, TraceEnd, FColor::Green, false, 1.0f, 0, 1.0f);
+			//if (bHit)
+			//{
+			//	DrawDebugPoint(GetWorld(), HitResult.Location, 10.0f, FColor::Red, false, 1.0f);
+			//}
+
+			if (IsPathClear(CameraLocation, HitResult.ImpactPoint + FVector::UpVector * (BoxExtent.X + 1), BoxExtent))
+			{
+				// Smoothly move the object to the target location
+				UPrimitiveComponent* ActorRootComponent = Cast<UPrimitiveComponent>(ActorInFocus->GetRootComponent());
+				if (ActorRootComponent)
+				{
+					ActorRootComponent->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
+				}
+
+				TargetLocationToRelease = HitResult.ImpactPoint + FVector::UpVector * BoxExtent.X;
+				bIsMovingToTarget = true;
+
+			}
+			else
+			{
+				UE_LOG(LogTemp, Warning, TEXT("Path is not clear, cannot release actor."));
 			}
 		}
 		else
@@ -249,37 +382,58 @@ bool UInteractiveComponent::IsPathClear(const FVector& StartLocation, const FVec
 		QueryParams
 	);
 
-#if UE_BUILD_DEBUG
-	DrawDebugBox(GetWorld(), StartLocation, BoxExtent, FColor::Red, false, 1.0f);
+	/*DrawDebugBox(GetWorld(), StartLocation, BoxExtent, FColor::Red, false, 1.0f);
 	DrawDebugBox(GetWorld(), EndLocation, BoxExtent, FColor::Green, false, 1.0f);
-	DrawDebugLine(GetWorld(), StartLocation, EndLocation, FColor::Blue, false, 1.0f, 0, 1.0f);
-#endif
+	DrawDebugLine(GetWorld(), StartLocation, EndLocation, FColor::Blue, false, 1.0f, 0, 1.0f);*/
 
 	if (HitResult.bBlockingHit)
-		UE_LOG(LogTemp, Warning, TEXT("Something is blocking box trace"))
+		DrawDebugPoint(GetWorld(), HitResult.ImpactPoint, 10.0f, FColor::Red, false, 4.0f);
 
 
-		return !bHit; // Return true if the path is clear
+	return !bHit; // Return true if the path is clear
 }
 
 void UInteractiveComponent::OnMoveItemComplete()
 {
 	if (Owner && ActorInFocus)
 	{
-		UCameraComponent* CameraComponent = Owner->GetFirstPersonCameraComponent();
-		if (CameraComponent)
+		if (!bIsHolding)
 		{
-			UPrimitiveComponent* ActorRootComponent = Cast<UPrimitiveComponent>(ActorInFocus->GetRootComponent());
-			if (ActorRootComponent)
+			UCameraComponent* CameraComponent = Owner->GetFirstPersonCameraComponent();
+			if (CameraComponent)
 			{
-				ActorRootComponent->AttachToComponent(CameraComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
-			
-				if (IInteractable* OldInteractable = Cast<IInteractable>(ActorInFocus))
+				UPrimitiveComponent* ActorRootComponent = Cast<UPrimitiveComponent>(ActorInFocus->GetRootComponent());
+				if (ActorRootComponent)
 				{
-					OldInteractable->OnInteractableOutOfRange();
+					ActorRootComponent->AttachToComponent(CameraComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+
+
+					if (IInteractable* OldInteractable = Cast<IInteractable>(ActorInFocus))
+					{
+						OldInteractable->OnInteractableOutOfRange();
+					}
 				}
 			}
 		}
+		else
+		{
+			if (IInteractable* OldInteractable = Cast<IInteractable>(ActorInFocus))
+			{
+				OldInteractable->OnInteractableOutOfRange();
+			}
+
+			// Get the new closest actor to the owner
+			SetActorInFocus(GetClosestToOwner(InteractableActors));
+
+			// Notify the new actor that it is in range
+			if (IInteractable* InteractableToCast = Cast<IInteractable>(ActorInFocus))
+			{
+				InteractableToCast->OnInteractableInRange();
+			}
+
+
+		}
+		bIsHolding = !bIsHolding;
 	}
 }
 

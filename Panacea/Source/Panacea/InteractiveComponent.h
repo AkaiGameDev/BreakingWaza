@@ -25,6 +25,8 @@ public:
 
     void Grab();
 
+    void Release();
+
     UPROPERTY(EditAnywhere)
     FVector GrabbedActorLocationViewport;
 
@@ -66,6 +68,8 @@ private:
     AActor* ActorInFocus = nullptr;
 
     UPrimitiveComponent* ActorInFocusRootComponent;
+
+    FVector TargetLocationToRelease;
 
     bool bIsMovingToTarget = false;
 
