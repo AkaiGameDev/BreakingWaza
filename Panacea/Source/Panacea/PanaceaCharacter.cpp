@@ -198,6 +198,11 @@ void APanaceaCharacter::Look(const FInputActionValue& Value)
 	}
 }
 
+void APanaceaCharacter::Jump(const FInputActionValue& Value)
+{
+	ACharacter::Jump();
+}
+
 
 void APanaceaCharacter::OnRestart()
 {
