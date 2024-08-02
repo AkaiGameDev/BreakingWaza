@@ -38,10 +38,6 @@ class APanaceaCharacter : public ACharacter
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly,  meta = (AllowPrivateAccess = "true"))
 	UMouseDragObjectsComponent* MouseDragObjectsComponent;
 
-	/** Component for grabbing objects */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	UGrabbingSystemComponent* GrabbingSystemComponent;
-
 	/** Component for physic handling*/
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly,  meta = (AllowPrivateAccess = "true"))
 	UPhysicsHandleComponent* PhysicsHandleComponent;

@@ -45,10 +45,6 @@ APanaceaCharacter::APanaceaCharacter()
 	MouseDragObjectsComponent = CreateDefaultSubobject<UMouseDragObjectsComponent>(TEXT("MouseDragObjectsComponent"));
 	MouseDragObjectsComponent->SetInitilizeReferences();
 
-	GrabbingSystemComponent = CreateDefaultSubobject<UGrabbingSystemComponent>(TEXT("GrabbingSystemComponent"));
-
-	PhysicsHandleComponent = CreateDefaultSubobject<UPhysicsHandleComponent>(TEXT("PhysicsHandleComponent"));
-
 	// Create an InteractiveComponent
 	InteractiveComponent = CreateDefaultSubobject<UInteractiveComponent>(TEXT("InteractiveComponent"));
 
