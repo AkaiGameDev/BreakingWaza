@@ -10,17 +10,17 @@ void APotionBottle::BeginPlay()
 {
 	Super::BeginPlay();
 
-	APanaceaGameMode* GameMode = Cast<APanaceaGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+	//APanaceaGameMode* GameMode = Cast<APanaceaGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 
-	if (!GameMode)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("GameMode is null"));
-		return;
-	}
+	//if (!GameMode)
+	//{
+	//	UE_LOG(LogTemp, Warning, TEXT("GameMode is null"));
+	//	return;
+	//}
 
-	// Set this actor to call Tick() every frame. You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
-	GameMode->OnItemInteractedDelegate.AddDynamic(this, &APotionBottle::CheckInteractable);
+	//// Set this actor to call Tick() every frame. You can turn this off to improve performance if you don't need it.
+	//PrimaryActorTick.bCanEverTick = true;
+	//GameMode->OnItemInteractedDelegate.AddDynamic(this, &APotionBottle::CheckInteractable);
 }
 
 // Called every frame
