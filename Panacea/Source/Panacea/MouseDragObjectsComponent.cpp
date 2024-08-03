@@ -99,7 +99,7 @@ void UMouseDragObjectsComponent::TickComponent(float DeltaTime, ELevelTick TickT
 
 	PhysicsHandle->SetTargetLocation(TargetLocation);
 
-	UE_LOG(LogTemp, Log, TEXT("Position: X=%f, Y=%f, Z=%f"), WorldPosition.X, WorldPosition.Y, WorldPosition.Z);
+	//UE_LOG(LogTemp, Log, TEXT("Position: X=%f, Y=%f, Z=%f"), WorldPosition.X, WorldPosition.Y, WorldPosition.Z);
 }
 
 
