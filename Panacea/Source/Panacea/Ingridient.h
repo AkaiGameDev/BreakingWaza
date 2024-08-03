@@ -34,12 +34,13 @@ public:
 	virtual void OnInteractableInRange() override;
 	virtual void OnInteractableOutOfRange() override;
 
-private:
 	UPROPERTY(EditAnywhere, Category = "Mesh")
 	UStaticMeshComponent* StaticMeshComponent;
 
 	UPROPERTY(VisibleAnywhere, Category = "Components")
 	USwitchComponent* SwitchComponent;
+
+private:
 
 	void SetMaterial(UMaterialInterface* NewMaterial);
 

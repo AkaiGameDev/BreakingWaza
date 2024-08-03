@@ -33,18 +33,8 @@ public:
 		bool Grabbable;
 
 	virtual void BeginPlay() override {
+
 		Super::BeginPlay();
-
-		/*APanaceaGameMode* GameMode = Cast<APanaceaGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
-
-		if (!GameMode)
-		{
-			UE_LOG(LogTemp, Warning, TEXT("GameMode is null"));
-			return;
-		}
-
-		OnItemInteractedDelegate = &GameMode->OnItemInteractedDelegate;*/
-
 
 		APanaceaGameMode* GameMode = Cast<APanaceaGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 
@@ -60,11 +50,17 @@ public:
 	}
 
 	virtual void Broadcast() override {
-		
+		APanaceaGameMode* GameMode = Cast<APanaceaGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 
+		if (!GameMode)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("GameMode is null"));
+			return;
+		}
+
+		UE_LOG(LogTemp, Warning, TEXT("%s broadcasted"), *GetActorLabel());
+		GameMode->OnItemInteractedDelegate.Broadcast(GetActorLabel());
 	}
-
-
 
 	virtual void OnInteractableInRange() override {
 
@@ -72,30 +68,35 @@ public:
 			return;
 		}
 
-		UStaticMeshComponent* mesh = GetComponentByClass<UStaticMeshComponent>();
-		if (mesh) {
-			mesh->SetRenderCustomDepth(true);
+		TArray<UStaticMeshComponent*> MeshComponents;
+		GetComponents<UStaticMeshComponent>(MeshComponents);
+
+		for (UStaticMeshComponent* MeshComponent : MeshComponents)
+		{
+			if (MeshComponent)
+				MeshComponent->SetRenderCustomDepth(true);
 		}
 	}
 	virtual void OnInteractableOutOfRange() override {
 
-		if (!Interactable) {
-			return;
-		}
+		TArray<UStaticMeshComponent*> MeshComponents;
+		GetComponents<UStaticMeshComponent>(MeshComponents);
 
-		UStaticMeshComponent* mesh = GetComponentByClass<UStaticMeshComponent>();
-		if (mesh) {
-			mesh->SetRenderCustomDepth(false);
+		for (UStaticMeshComponent* MeshComponent : MeshComponents)
+		{
+			if (MeshComponent)
+				MeshComponent->SetRenderCustomDepth(false);
 		}
 	}
 
 	virtual void Interact() override {
-
+		UE_LOG(LogTemp, Warning, TEXT("works"));
+		Broadcast();
 	}
 
 	UFUNCTION()
 	virtual void CheckInteractable(const FString& itemInteracted) override {
-		UE_LOG(LogTemp, Warning, TEXT("Check interactable called by"), *itemInteracted);
+		UE_LOG(LogTemp, Warning, TEXT("Check interactable called by %s"), *itemInteracted);
 		if (itemInteracted == InteractableTrigger) {
 			SetInteractable();
 		}

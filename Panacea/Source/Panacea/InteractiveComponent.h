@@ -36,7 +36,9 @@ public:
     UPROPERTY(EditAnywhere)
     float ReleaseDistance;
 
+    void ResetActorInFocus(AActor* OtherActor);
 
+    void SetAndStartMovement(const FVector& TargetVector);
 protected:
     // Called when the game starts
     virtual void BeginPlay() override;
@@ -77,9 +79,9 @@ private:
 
     FVector TargetLocationToRelease;
 
-
     bool bIsMovingToTarget;
 
     bool bIsHolding;
+
     UUserWidget* HintInteractionWidget = nullptr;
 };
