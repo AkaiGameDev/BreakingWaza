@@ -58,8 +58,8 @@ public:
 			return;
 		}
 
-		UE_LOG(LogTemp, Warning, TEXT("%s broadcasted"), *GetActorLabel());
-		GameMode->OnItemInteractedDelegate.Broadcast(GetActorLabel());
+		UE_LOG(LogTemp, Warning, TEXT("%s broadcasted"), *GetActorNameOrLabel());
+		GameMode->OnItemInteractedDelegate.Broadcast(GetActorNameOrLabel());
 	}
 
 	virtual void OnInteractableInRange() override {
@@ -90,7 +90,6 @@ public:
 	}
 
 	virtual void Interact() override {
-		UE_LOG(LogTemp, Warning, TEXT("works"));
 		Broadcast();
 	}
 

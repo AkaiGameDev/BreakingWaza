@@ -23,6 +23,7 @@ void AKeyActor::Interact()
 
 	if (bIsChestOverlapping)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("WORKS")); 
 		Broadcast();
 
 		UInteractiveComponent* InteractiveComponent = Character->GetComponentByClass<UInteractiveComponent>();
