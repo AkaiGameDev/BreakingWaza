@@ -22,11 +22,11 @@ UInteractiveComponent::UInteractiveComponent()
 	GrabbedActorLocationViewport = FVector(70.0f, 30.0f, -30.0f);
 
 	MovementSpeed = 20.0f; // Units per second
-	ReleaseDistance = 300.0f;
+	ReleaseDistance = 220.0f;
 
 	// Create and initialize the capsule component
 	CapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>(TEXT("CapsuleComponent"));
-	CapsuleComponent->InitCapsuleSize(20.0f, 170.0f); // Set the radius and half-height for the capsule
+	CapsuleComponent->InitCapsuleSize(20.0f, 140.0f); // Set the radius and half-height for the capsule
 	CapsuleComponent->SetCollisionProfileName(TEXT("OverlapAllDynamic"));
 	CapsuleComponent->SetVisibility(true);
 
@@ -67,7 +67,7 @@ void UInteractiveComponent::BeginPlay()
 	}
 
 	CapsuleComponent->AttachToComponent(RootComp, FAttachmentTransformRules::KeepRelativeTransform);
-	CapsuleComponent->SetRelativeLocation(FVector::ForwardVector * 100.0f);
+	CapsuleComponent->SetRelativeLocation(FVector::ForwardVector * 130.0f);
 	CapsuleComponent->SetRelativeRotation(FRotator(90.0f, 0.0f, 0.0f));
 
 	if (HintInteractionWidget)
@@ -268,7 +268,43 @@ void UInteractiveComponent::OnOverlapEnd(UPrimitiveComponent* OverlappedComponen
 		if (OverlappingActors.Contains(OtherActor))
 			return;
 
-		ResetActorInFocus(OtherActor);
+		InteractableActors.Remove(OtherActor);
+	
+		if (bIsHolding)
+			return;
+
+		// If the actor going out of range was in focus, update the focus
+		if (OtherActor == ActorInFocus)
+		{
+			if (IInteractable* OldInteractable = Cast<IInteractable>(ActorInFocus))
+			{
+				OldInteractable->OnInteractableOutOfRange();
+				AItem* Item = Cast<AItem>(ActorInFocus);
+
+				if (Item)
+				{
+					HintInteractionWidget->SetVisibility(ESlateVisibility::Hidden);
+				}
+			}
+		}
+
+	
+
+		// Get the new closest actor to the owner
+		SetActorInFocus(GetClosestToOwner(InteractableActors));
+
+		// Notify the new actor that it is in range
+		if (IInteractable* InteractableToCast = Cast<IInteractable>(ActorInFocus))
+		{
+			InteractableToCast->OnInteractableInRange();
+
+			AItem* Item = Cast<AItem>(ActorInFocus);
+
+			if (Item && Item->Interactable)
+			{
+				HintInteractionWidget->SetVisibility(ESlateVisibility::Visible);
+			}
+		}
 	}
 }
 
