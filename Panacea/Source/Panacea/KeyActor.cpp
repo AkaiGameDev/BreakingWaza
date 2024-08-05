@@ -28,7 +28,7 @@ void AKeyActor::Interact()
 		UInteractiveComponent* InteractiveComponent = Character->GetComponentByClass<UInteractiveComponent>();
 		if (InteractiveComponent)
 		{
-			InteractiveComponent->SetAndStartMovement(ChestLockLocation, FRotator(), true);
+			InteractiveComponent->SetAndStartMovement(ChestLockLocation, ChestLockRotation, true);
 			SetNotInteractable();
 		}
 	}

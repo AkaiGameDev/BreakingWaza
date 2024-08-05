@@ -18,4 +18,7 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	FVector ChestLockLocation;
+
+	UPROPERTY(EditAnywhere)
+	FRotator ChestLockRotation;
 };
