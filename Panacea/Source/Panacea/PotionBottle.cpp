@@ -73,12 +73,12 @@ void APotionBottle::OnComponentReleased(UPrimitiveComponent* ReleasedComponent)
 	}
 
 	FVector Start = StaticMeshComponent->GetComponentLocation();
-	FVector End = Start - FVector(0.0f, 0.0f, BreakableDistance);  // Trace downwards 1000 units, adjust as needed
+	FVector End = Start - FVector(0.0f, 0.0f, BreakableDistance); 
 
 	FVector Origin, BoxBounds;
 	StaticMeshComponent->GetLocalBounds(Origin, BoxBounds);
 	FVector ActorScale = StaticMeshComponent->GetComponentScale();
-	FVector BoxExtent = BoxBounds * ActorScale; // Half size to get the box extent
+	FVector BoxExtent = BoxBounds * ActorScale; 
 
 	FCollisionShape Box = FCollisionShape::MakeBox(BoxExtent);
 	FHitResult HitResult;
@@ -105,7 +105,6 @@ void APotionBottle::OnComponentReleased(UPrimitiveComponent* ReleasedComponent)
 
 	if (!bHit)
 	{
-		// Actor is higher than the threshold distance
 		FTransform MeshTransform = StaticMeshComponent->GetComponentTransform();
 		StaticMeshComponent->DestroyComponent();
 
