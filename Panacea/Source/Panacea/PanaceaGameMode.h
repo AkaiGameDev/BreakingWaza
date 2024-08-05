@@ -49,10 +49,7 @@ public:
 	void OnBadEndingSequence();
 
 	UFUNCTION(BlueprintCallable)
-	void BroadcastBadEndingEvent();
-	
-	UFUNCTION(BlueprintCallable)
-	void BroadcastOnItemInteracted(const FString& IngredientName);
+		void BroadcastBadEndingEvent();
 
 private:
 

@@ -50,11 +50,6 @@ void APanaceaGameMode::BroadcastBadEndingEvent()
 	OnBadEnding.Broadcast();
 }
 
-void APanaceaGameMode::BroadcastOnItemInteracted(const FString& IngredientName)
-{
-	OnItemInteractedDelegate.Broadcast(IngredientName);
-}
-
 void APanaceaGameMode::CheckGoodEnding()
 {
 	if (IngredientNames.Num() > 1)

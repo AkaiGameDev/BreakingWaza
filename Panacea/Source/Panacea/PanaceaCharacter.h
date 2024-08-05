@@ -109,11 +109,8 @@ protected:
 public:
 	/** Returns Mesh1P subobject **/
 	USkeletalMeshComponent* GetMesh1P() const { return Mesh1P; }
-
 	/** Returns FirstPersonCameraComponent subobject **/
-	UFUNCTION(BlueprintCallable)
 	UCameraComponent* GetFirstPersonCameraComponent() const { return FirstPersonCameraComponent; }
-	
 	/** Returns DefaultMappingContext subobject **/
 	UInputMappingContext* GetDefaultMappingContext() const { return DefaultMappingContext; }
 
