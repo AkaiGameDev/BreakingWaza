@@ -3,16 +3,16 @@
 #include "CoreMinimal.h"
 #include "Item.h"
 #include "GameFramework/Actor.h"
-#include "Diary.generated.h"
+#include "NoteActor.generated.h"
 
 UCLASS()
-class PANACEA_API ADiary : public AItem
+class PANACEA_API ANoteActor : public AItem
 {
 	GENERATED_BODY()
 
 public:
 	// Sets default values for this actor's properties
-	ADiary();
+	ANoteActor();
 
 	UPROPERTY(EditAnywhere, Category = "UI")
 	TSubclassOf<UUserWidget> PauseMenuWidgetClass;

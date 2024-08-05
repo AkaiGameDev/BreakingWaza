@@ -1,10 +1,10 @@
-#include "Diary.h"
+#include "NoteActor.h"
 #include "Blueprint/UserWidget.h"
 #include "Components/TextBlock.h"
 
 
 // Sets default values
-ADiary::ADiary()
+ANoteActor::ANoteActor()
 {
 	// Set this actor to call Tick() every frame. You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -12,12 +12,12 @@ ADiary::ADiary()
 }
 
 // Called when the game starts or when spawned
-void ADiary::BeginPlay()
+void ANoteActor::BeginPlay()
 {
 	Super::BeginPlay();
 }
 
-void ADiary::Interact()
+void ANoteActor::Interact()
 { 
 	UE_LOG(LogTemp, Warning, TEXT("Diary interact called"));
 	if (Interactable) {
