@@ -23,13 +23,12 @@ void AKeyActor::Interact()
 
 	if (bIsChestOverlapping)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("WORKS")); 
 		Broadcast();
 
 		UInteractiveComponent* InteractiveComponent = Character->GetComponentByClass<UInteractiveComponent>();
 		if (InteractiveComponent)
 		{
-			InteractiveComponent->SetAndStartMovement(ChestLockLocation);
+			InteractiveComponent->SetAndStartMovement(ChestLockLocation, FRotator(), true);
 			SetNotInteractable();
 		}
 	}

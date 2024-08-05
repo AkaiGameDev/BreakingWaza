@@ -5,12 +5,13 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "Components/CapsuleComponent.h"
-#include "IInteractable.h"
 
 #include "InputActionValue.h"
 #include "InteractiveComponent.generated.h"
 
 class APanaceaCharacter;
+class AItem;
+class UCameraComponent;
 
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class PANACEA_API UInteractiveComponent : public UActorComponent
@@ -27,6 +28,10 @@ public:
 
     void Release();
 
+    void ResetActorInFocus(AActor* OtherActor, bool bRemoveActor = true);
+
+    void SetAndStartMovement(const FVector& TargetVector, const FRotator& TargetRotator, bool bIsRelease);
+
     UPROPERTY(EditAnywhere)
     FVector GrabbedActorLocationViewport;
 
@@ -35,10 +40,6 @@ public:
     
     UPROPERTY(EditAnywhere)
     float ReleaseDistance;
-
-    void ResetActorInFocus(AActor* OtherActor);
-
-    void SetAndStartMovement(const FVector& TargetVector);
 
     UPROPERTY(EditAnywhere)
     bool bIsHolding;
@@ -68,21 +69,29 @@ private:
 
     void SetActorInFocus(AActor* NewActorInFocus);
 
-    // Capsule component for collision detection
-    UCapsuleComponent* CapsuleComponent;
+    void OnTickUpdateItemTransform(float DeltaTime);
 
-    // List of interactable actors within range
+    FVector FindPlaceToRelease(FVector& BoxExtent);
+
+    UCapsuleComponent* InteractiveCapsuleCollider;
+
     TArray<AActor*> InteractableActors;
 
     AActor* ActorInFocus;
 
     UPrimitiveComponent* ActorInFocusRootComponent;
 
-    IInteractable* ActorInFocusInteractableInterface;
+    AItem* ActorInFocusInteractable;
+
+    UCameraComponent* CharacterCameraComponent;
 
     FVector TargetLocationToRelease;
 
+    FRotator TargetRotationToRelease;
+
+    UUserWidget* HintInteractionWidget;
+
     bool bIsMovingToTarget;
 
-    UUserWidget* HintInteractionWidget = nullptr;
+   
 };
