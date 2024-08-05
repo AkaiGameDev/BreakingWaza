@@ -9,16 +9,21 @@ UCLASS()
 class PANACEA_API ADiary : public AItem
 {
 	GENERATED_BODY()
-	
+
 public:
 	// Sets default values for this actor's properties
 	ADiary();
 
 	UPROPERTY(EditAnywhere, Category = "UI")
-		TSubclassOf<UUserWidget> PauseMenuWidgetClass;
+	TSubclassOf<UUserWidget> PauseMenuWidgetClass;
+
+	//text
+	UPROPERTY(EditAnywhere, Category= "UI")
+	FString NoteText;
 
 	UPROPERTY()
 	UUserWidget* PauseMenuWidget = nullptr;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

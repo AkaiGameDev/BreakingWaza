@@ -1,5 +1,6 @@
 #include "Diary.h"
 #include "Blueprint/UserWidget.h"
+#include "Components/TextBlock.h"
 
 
 // Sets default values
@@ -78,7 +79,15 @@ void ADiary::Interact()
 		
 		            // Add the widget to the viewport
 		            PauseMenuWidget->AddToViewport();
-		
+
+		    		//get text from the note
+		            UTextBlock* TextBlock = Cast<UTextBlock>(PauseMenuWidget->GetWidgetFromName(TEXT("Content")));
+		            if (TextBlock)
+		            {
+		                TextBlock->SetText(FText::FromString(NoteText));
+		            }
+
+
 		            // Set the input mode to UI only and show the mouse cursor
 		            FInputModeUIOnly InputMode;
 		            InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
