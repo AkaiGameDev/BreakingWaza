@@ -36,7 +36,7 @@ void ANoteActor::Interact()
 		        // Unpause the game if it's currently paused
 		        if (PauseMenuWidget)
 		        {
-		            PauseMenuWidget->RemoveFromViewport();
+		            PauseMenuWidget->RemoveFromParent();
 		            PauseMenuWidget = nullptr;
 		            UE_LOG(LogTemp, Warning, TEXT("Pause Menu Removed"));
 		
