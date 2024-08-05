@@ -5,16 +5,21 @@
 #include "CoreMinimal.h"
 #include "IInteractable.h"
 #include "GameFramework/Actor.h"
-#include "TestInteractableActor.generated.h"
+
+class USwitchComponent;
+
+#include "Ingridient.generated.h"
+
+
 
 UCLASS()
-class PANACEA_API ATestInteractableActor : public AActor, public IInteractable
+class PANACEA_API AIngridient : public AActor, public IInteractable
 {
 	GENERATED_BODY()
 	
 public:	
 	// Sets default values for this actor's properties
-	ATestInteractableActor();
+	AIngridient();
 
 protected:
 	// Called when the game starts or when spawned
@@ -26,9 +31,17 @@ public:
 
 	// Interact override
 	virtual void Interact() override;
+	virtual void OnInteractableInRange() override;
+	virtual void OnInteractableOutOfRange() override;
 
-	///level name editable in engine
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Level")
-	FName LevelName;
+	UPROPERTY(EditAnywhere, Category = "Mesh")
+	UStaticMeshComponent* StaticMeshComponent;
+
+	UPROPERTY(VisibleAnywhere, Category = "Components")
+	USwitchComponent* SwitchComponent;
+
+private:
+
+	void SetMaterial(UMaterialInterface* NewMaterial);
 
 };
