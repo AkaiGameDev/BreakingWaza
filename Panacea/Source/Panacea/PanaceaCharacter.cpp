@@ -42,7 +42,6 @@ APanaceaCharacter::APanaceaCharacter()
 	Mesh1P->SetRelativeLocation(FVector(-30.f, 0.f, -150.f));
 
 	MouseDragObjectsComponent = CreateDefaultSubobject<UMouseDragObjectsComponent>(TEXT("MouseDragObjectsComponent"));
-	MouseDragObjectsComponent->SetInitilizeReferences();
 
 	// Create an InteractiveComponent
 	InteractiveComponent = CreateDefaultSubobject<UInteractiveComponent>(TEXT("InteractiveComponent"));

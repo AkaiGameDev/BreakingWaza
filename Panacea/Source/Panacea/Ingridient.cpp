@@ -44,7 +44,7 @@ void AIngridient::BeginPlay()
 			if (ChildMesh)
 			{
 				// Log the name of the found mesh
-				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Child Mesh Found: ") + ChildMesh->GetName());
+				//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Child Mesh Found: ") + ChildMesh->GetName());
 				StaticMeshComponent = ChildMesh;
 				break; // Exit the loop after finding the first child mesh
 			}
@@ -53,7 +53,7 @@ void AIngridient::BeginPlay()
 
 	if (!StaticMeshComponent)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("No child StaticMeshComponent found"));
+		//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("No child StaticMeshComponent found"));
 	}
 
 
@@ -76,20 +76,20 @@ void AIngridient::Interact()
 	}
 	else
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("SwitchComponent not found"));
+		//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("SwitchComponent not found"));
 	}
 }
 
 void AIngridient::OnInteractableInRange()
 {
 	StaticMeshComponent->SetRenderCustomDepth(true);
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("In Range:") + GetActorLabel());
+	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("In Range:") + GetActorNameOrLabel());
 }
 
 void AIngridient::OnInteractableOutOfRange()
 {
 	StaticMeshComponent->SetRenderCustomDepth(false);
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, TEXT("Out Of Range:") + GetActorLabel());
+	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, TEXT("Out Of Range:") + GetActorNameOrLabel());
 }
 
 void AIngridient::SetMaterial(UMaterialInterface* NewMaterial)

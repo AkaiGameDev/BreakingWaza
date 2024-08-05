@@ -1,8 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "SwitchComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "MouseDragObjectsComponent.h"
 
 // Sets default values for this component's properties
 USwitchComponent::USwitchComponent()
@@ -41,13 +41,13 @@ void USwitchComponent::BeginPlay()
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Camera Found"));
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red,
-		                                 FString::Printf(
-			                                 TEXT("Camera Location: %s"),
-			                                 *ObjectCamera->GetRelativeLocation().ToString()));
+			FString::Printf(
+				TEXT("Camera Location: %s"),
+				*ObjectCamera->GetRelativeLocation().ToString()));
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red,
-		                                 FString::Printf(
-			                                 TEXT("Camera Rotation: %s"),
-			                                 *ObjectCamera->GetRelativeRotation().ToString()));
+			FString::Printf(
+				TEXT("Camera Rotation: %s"),
+				*ObjectCamera->GetRelativeRotation().ToString()));
 	}
 }
 
@@ -75,6 +75,14 @@ void USwitchComponent::SwitchCamera()
 		OriginalViewTarget = PlayerController->GetViewTarget();
 		PlayerController->SetViewTargetWithBlend(GetOwner(), 0.5f, EViewTargetBlendFunction::VTBlend_Cubic);
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("Switched to object camera view"));
+	}
+
+	ACharacter* Character = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
+	UMouseDragObjectsComponent* MouseDragObjectsComponent = Character->GetComponentByClass<UMouseDragObjectsComponent>();
+	
+	if (MouseDragObjectsComponent)
+	{
+		MouseDragObjectsComponent->SwitchGrabMode();
 	}
 }
 

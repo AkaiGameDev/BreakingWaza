@@ -1,38 +1,136 @@
 #include "PotionBottle.h"
+#include "MouseDragObjectsComponent.h"
+#include "SwitchComponent.h"
+#include "InteractiveComponent.h"
 
-//Sets default values
 APotionBottle::APotionBottle()
 {
-	
+	PrimaryActorTick.bCanEverTick = true;
+	bIsBreaked = false;
+	BreakableDistance = 20.0f;
+
+	DefaultSceneRoot = CreateDefaultSubobject<USceneComponent>(TEXT("DefaultSceneRoot"));
+	RootComponent = DefaultSceneRoot;
+
+	// Create and initialize StaticMeshComponent
+	StaticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMeshComponent"));
+	StaticMeshComponent->SetupAttachment(RootComponent);
+
+	GeometryCollectionComponent = CreateDefaultSubobject<UGeometryCollectionComponent>(TEXT("GeometryCollectionComponent"));
+	GeometryCollectionComponent->SetupAttachment(RootComponent);
+	GeometryCollectionComponent->SetVisibility(false);
+	GeometryCollectionComponent->SetSimulatePhysics(false);
+
+	SwitchComponent = CreateDefaultSubobject<USwitchComponent>(TEXT("SwitchComponent"));
+	SwitchComponent->SetupAttachment(RootComponent);
 }
 
 void APotionBottle::BeginPlay()
 {
 	Super::BeginPlay();
 
-	APanaceaGameMode* GameMode = Cast<APanaceaGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
-
-	if (!GameMode)
+	if (GeometryCollectionComponent)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("GameMode is null"));
+		// Bind to the fracture event
+		GeometryCollectionComponent->SetNotifyBreaks(true);
+		GeometryCollectionComponent->OnChaosBreakEvent.AddDynamic(this, &APotionBottle::OnComponentFracture);
+	}
+
+	ACharacter* Character = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
+	UMouseDragObjectsComponent* MouseDragObjectsComponent = Character->GetComponentByClass<UMouseDragObjectsComponent>();
+
+	if (MouseDragObjectsComponent)
+	{
+		MouseDragObjectsComponent->OnComponentMouseRelease.AddDynamic(this, &APotionBottle::OnComponentReleased);
+	}
+}
+
+void APotionBottle::OnComponentFracture(const FChaosBreakEvent& BreakEvent)
+{
+	if (!bIsBreaked)
+	{
+		bIsBreaked = true;
+
+		Interact();
+
+		Broadcast();
+		SetNotInteractable();
+
+		ACharacter* Character = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
+		UInteractiveComponent* InteractiveComponent = Character->GetComponentByClass<UInteractiveComponent>();
+
+		if (InteractiveComponent)
+		{
+			InteractiveComponent->ResetActorInFocus(this);
+		}
+	}
+}
+
+void APotionBottle::OnComponentReleased(UPrimitiveComponent* ReleasedComponent)
+{
+	if (!Interactable) {
 		return;
 	}
 
-	// Set this actor to call Tick() every frame. You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
-	GameMode->OnItemInteractedDelegate.AddDynamic(this, &APotionBottle::CheckInteractable);
-}
+	FVector Start = StaticMeshComponent->GetComponentLocation();
+	FVector End = Start - FVector(0.0f, 0.0f, BreakableDistance); 
 
-// Called every frame
-void APotionBottle::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
+	FVector Origin, BoxBounds;
+	StaticMeshComponent->GetLocalBounds(Origin, BoxBounds);
+	FVector ActorScale = StaticMeshComponent->GetComponentScale();
+	FVector BoxExtent = BoxBounds * ActorScale; 
+
+	FCollisionShape Box = FCollisionShape::MakeBox(BoxExtent);
+	FHitResult HitResult;
+
+
+	ACharacter* Character = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
+	FCollisionQueryParams QueryParams;
+	QueryParams.AddIgnoredActor(this);
+	QueryParams.AddIgnoredActor(Character);
+
+	bool bHit = GetWorld()->SweepSingleByChannel(
+		HitResult,
+		Start,
+		End,
+		FQuat::Identity,
+		ECC_Visibility,
+		Box,
+		QueryParams
+	);
+
+	/*DrawDebugBox(GetWorld(), Start, BoxExtent, FColor::Red, false, 1.0f);
+	DrawDebugBox(GetWorld(), End, BoxExtent, FColor::Green, false, 1.0f);
+	DrawDebugLine(GetWorld(), Start, End, FColor::Blue, false, 1.0f, 0, 1.0f);*/
+
+	if (!bHit)
+	{
+		FTransform MeshTransform = StaticMeshComponent->GetComponentTransform();
+		StaticMeshComponent->DestroyComponent();
+
+		GeometryCollectionComponent->SetWorldTransform(MeshTransform);
+		GeometryCollectionComponent->SetVisibility(true);
+		GeometryCollectionComponent->SetSimulatePhysics(true);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Potion bottle is too low to break."));
+	}
 }
 
 void APotionBottle::Interact()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Potion bottle interact called"));
-	if (Interactable) {
-		UE_LOG(LogTemp, Warning, TEXT("Potion bottle interacted with"));
+	if (!Interactable)
+		return;
+
+	if (StaticMeshComponent)
+	{
+		StaticMeshComponent->SetSimulatePhysics(!StaticMeshComponent->IsSimulatingPhysics());
+	}
+
+	if (SwitchComponent)
+	{
+		SwitchComponent->SwitchCamera();
 	}
 }
+

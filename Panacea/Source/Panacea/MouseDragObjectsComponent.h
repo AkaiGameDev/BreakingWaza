@@ -1,6 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
+
 #include "PanaceaCharacter.h"
 #include "PhysicsEngine/PhysicsHandleComponent.h"
 
@@ -8,6 +9,7 @@
 #include "Components/ActorComponent.h"
 #include "MouseDragObjectsComponent.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnComponentMouseRelease, UPrimitiveComponent*, ReleasedComponent);
 
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class PANACEA_API UMouseDragObjectsComponent : public UActorComponent
@@ -15,48 +17,41 @@ class PANACEA_API UMouseDragObjectsComponent : public UActorComponent
 	GENERATED_BODY()
 
 public:
-	// Sets default values for this component's properties
 	UMouseDragObjectsComponent();
 
-	// Initilizes needed references
-	void SetInitilizeReferences();
-
-	// Switches grab mode on/off to activate mouse controlls
 	void SwitchGrabMode();
 
-	// Traces line from mouse cursor location forward to find Component to grab
-	UPrimitiveComponent* FindComponent(FHitResult& HitResult);
-
-	// Grabs Component that simulates physics
-	void GrabComponent();
-
-	// Releases Component that simulates physics
-	void ReleaseComponent();
-
-	// MappingContext 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputMappingContext* MouseDragObjectsMappingContext;
 
-	// Mouse click Input Action
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* GrabObjectAction;
 
-	// Change Grab Mode Input Action
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* GrabModeAction;
 
+	UPROPERTY(VisibleAnywhere)
+	UPhysicsHandleComponent* PhysicsHandle;
+
+	UPROPERTY(EditAnywhere)
+	float TraceSpehereRadius;
+
+	UPROPERTY(BlueprintAssignable, Category = "Mouse Drag")
+	FOnComponentMouseRelease OnComponentMouseRelease;
+
 protected:
-	// Called when the game starts
 	virtual void BeginPlay() override;
 
 public:
-	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 private:
-	// Physics Handle Component
-	UPROPERTY(VisibleAnywhere)
-	UPhysicsHandleComponent* PhysicsHandle;
+	void InitializeReferences();
+	void SetupInputBindings();
+	UPrimitiveComponent* PerformTrace(FHitResult& HitResult, float Radius) const;
+	void GrabObject();
+	void ReleaseObject();
+
 
 	APanaceaCharacter* Character;
 	APlayerController* PlayerController;
@@ -64,9 +59,5 @@ private:
 	UPrimitiveComponent* GrabbedComponent;
 	bool bIsGrabMode;
 	float OriginalDistanceToComponent;
-
-	// Crosshair
 	UUserWidget* Crosshair;
-	
-
 };
