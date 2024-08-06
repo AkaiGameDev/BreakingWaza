@@ -20,6 +20,7 @@ UInteractiveComponent::UInteractiveComponent()
 	bIsMovingToTarget = false;
 
 	GrabbedActorLocationViewport = FVector(70.0f, 30.0f, -30.0f);
+	GrabbedActorRotationViewport = FRotator::ZeroRotator;
 
 	MovementSpeed = 20.0f; // Units per second
 	ReleaseDistance = 220.0f;
@@ -241,7 +242,7 @@ void UInteractiveComponent::Release()
 		{
 			FRotator CurrentRotation = ActorInFocusRootComponent->GetComponentRotation();
 
-			SetAndStartMovement(TargetLocationToRelease, FRotator(0.0f, CurrentRotation.Yaw, CurrentRotation.Roll), true);
+			SetAndStartMovement(TargetLocationToRelease, FRotator(0.0f, CurrentRotation.Yaw, 0.0f), true);
 
 		}
 		else
@@ -470,7 +471,7 @@ void UInteractiveComponent::OnTickUpdateItemTransform(float DeltaTime)
 	FRotator CurrentRotation = bIsHolding ? ActorInFocusRootComponent->GetComponentRotation() : ActorInFocusRootComponent->GetRelativeRotation();
 
 	FVector DesiredLocation = bIsHolding ? TargetLocationToRelease : GrabbedActorLocationViewport;
-	FRotator DesiredRotation = bIsHolding ? TargetRotationToRelease : FRotator::ZeroRotator;
+	FRotator DesiredRotation = bIsHolding ? TargetRotationToRelease : GrabbedActorRotationViewport;
 
 	FVector NewLocation = FMath::VInterpTo(CurrentLocation, DesiredLocation, DeltaTime, MovementSpeed);
 	FRotator NewRotation = FMath::RInterpTo(CurrentRotation, DesiredRotation, DeltaTime, MovementSpeed);

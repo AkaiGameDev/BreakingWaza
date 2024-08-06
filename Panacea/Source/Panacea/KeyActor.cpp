@@ -7,9 +7,20 @@
 
 void AKeyActor::Interact()
 {
+	ACharacter* Character = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
+	UInteractiveComponent* InteractiveComponent = Character->GetComponentByClass<UInteractiveComponent>();
+	if (InteractiveComponent)
+	{
+		if (InteractiveComponent->bIsHolding)
+			InteractiveComponent->GrabbedActorRotationViewport = FRotator::ZeroRotator;
+		else
+			InteractiveComponent->GrabbedActorRotationViewport = FRotator(0.0f, 90.0f, 90.0f);
+
+	}
+
+
 	bool bIsChestOverlapping = false;
 
-	ACharacter* Character = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
 	TArray<AActor*> OverlappingActors;
 	Character->GetOverlappingActors(OverlappingActors);
 
@@ -25,7 +36,6 @@ void AKeyActor::Interact()
 	{
 		Broadcast();
 
-		UInteractiveComponent* InteractiveComponent = Character->GetComponentByClass<UInteractiveComponent>();
 		if (InteractiveComponent)
 		{
 			InteractiveComponent->SetAndStartMovement(ChestLockLocation, ChestLockRotation, true);

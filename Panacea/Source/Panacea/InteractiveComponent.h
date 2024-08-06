@@ -36,6 +36,9 @@ public:
     FVector GrabbedActorLocationViewport;
 
     UPROPERTY(EditAnywhere)
+    FRotator GrabbedActorRotationViewport;
+
+    UPROPERTY(EditAnywhere)
     float MovementSpeed; // Units per second
     
     UPROPERTY(EditAnywhere)
