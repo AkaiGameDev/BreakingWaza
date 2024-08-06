@@ -47,6 +47,7 @@ public:
 		// Set this actor to call Tick() every frame. You can turn this off to improve performance if you don't need it.
 		PrimaryActorTick.bCanEverTick = true;
 		GameMode->OnItemInteractedDelegate.AddDynamic(this, &AItem::CheckInteractable);
+		GameMode->OnItemFirstInteractedDelegate.AddDynamic(this, &AItem::FirstInteraction);
 	}
 
 	virtual void Broadcast() override {
@@ -91,6 +92,21 @@ public:
 
 	virtual void Interact() override {
 		Broadcast();
+	}
+
+	UFUNCTION()
+	virtual void FirstInteraction(const FString& itemInteracted)
+	{
+		APanaceaGameMode* GameMode = Cast<APanaceaGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+
+		if (!GameMode)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("GameMode is null"));
+			return;
+		}
+
+		const FText Message = FText::Format(FText::FromString("FT_"), FText::FromString(GetActorNameOrLabel()));
+		GameMode->OnItemFirstInteractedDelegate.Broadcast(Message.ToString());
 	}
 
 	UFUNCTION()

@@ -60,6 +60,7 @@ void APanaceaGameMode::BroadcastBadEndingEvent()
 void APanaceaGameMode::BroadcastOnItemInteracted(const FString& IngredientName)
 {
 	OnItemInteractedDelegate.Broadcast(IngredientName);
+
 }
 
 void APanaceaGameMode::BroadcastOnItemFirstInteracted(const FString& StringId)

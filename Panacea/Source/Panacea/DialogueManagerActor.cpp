@@ -38,6 +38,11 @@ void ADialogueManagerActor::BeginPlay()
 
 			//get text block from widget
 			DialogueTextBlock = Cast<UTextBlock>(DialogueWidget->GetWidgetFromName(TEXT("Dialogue")));
+
+			if(!DialogueTextBlock)
+			{
+				UE_LOG(LogTemp, Error, TEXT("Failed to get Dialogue text block"));
+			}
 		}
 		else
 		{

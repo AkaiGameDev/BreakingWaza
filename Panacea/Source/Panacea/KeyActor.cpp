@@ -7,6 +7,10 @@
 
 void AKeyActor::Interact()
 {
+
+	FirstInteraction(GetName());
+
+
 	bool bIsChestOverlapping = false;
 
 	ACharacter* Character = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
