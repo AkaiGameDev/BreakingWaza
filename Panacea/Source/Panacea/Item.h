@@ -14,23 +14,23 @@ UCLASS(ABSTRACT)
 class PANACEA_API AItem : public AActor, public IIInteractableItem
 {
 	GENERATED_BODY()
-	
 
-public:	
+
+public:
 
 	AItem() {
-		
+
 	}
 
 	UPROPERTY(EditAnywhere)
-		bool Interactable;
+	bool Interactable;
 
 	UPROPERTY(EditAnywhere)
-		FString InteractableTrigger;
+	FString InteractableTrigger;
 
 	//Flag that controls whether the player can pick up the item
 	UPROPERTY(EditAnywhere)
-		bool Grabbable;
+	bool Grabbable;
 
 	virtual void BeginPlay() override {
 
@@ -47,6 +47,7 @@ public:
 		// Set this actor to call Tick() every frame. You can turn this off to improve performance if you don't need it.
 		PrimaryActorTick.bCanEverTick = true;
 		GameMode->OnItemInteractedDelegate.AddDynamic(this, &AItem::CheckInteractable);
+		//GameMode->OnItemFirstInteractedDelegate.AddDynamic(this, &AItem::FirstInteraction);
 	}
 
 	virtual void Broadcast() override {
@@ -91,6 +92,24 @@ public:
 
 	virtual void Interact() override {
 		Broadcast();
+	}
+
+	UFUNCTION()
+	virtual void FirstInteraction()
+	{
+		APanaceaGameMode* GameMode = Cast<APanaceaGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+
+		if (!GameMode)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("GameMode is null"));
+			return;
+		}
+
+		FString ItemID = "FT_" + GetActorNameOrLabel();
+
+		bool bIsFirst = !GameMode->GetItemNames().Contains(ItemID);
+		if (bIsFirst)
+			GameMode->OnItemInteractedDelegate.Broadcast(ItemID);
 	}
 
 	UFUNCTION()

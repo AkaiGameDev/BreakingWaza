@@ -7,6 +7,7 @@
 
 void AKeyActor::Interact()
 {
+	FirstInteraction();
 	ACharacter* Character = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
 	UInteractiveComponent* InteractiveComponent = Character->GetComponentByClass<UInteractiveComponent>();
 	if (InteractiveComponent)

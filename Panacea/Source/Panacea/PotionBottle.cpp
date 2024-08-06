@@ -132,5 +132,7 @@ void APotionBottle::Interact()
 	{
 		SwitchComponent->SwitchCamera();
 	}
+
+	FirstInteraction();
 }
 
