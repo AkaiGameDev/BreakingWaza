@@ -1,7 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
+
+#include "DialogueManagerActor.h"
 #include "Kismet/GameplayStatics.h"
 #include "PanaceaGameMode.h"
-#include "DialogueManagerActor.h"
 
 #include "Blueprint/UserWidget.h"
 #include "Components/TextBlock.h"
@@ -24,14 +25,14 @@ void ADialogueManagerActor::BeginPlay()
 		return;
 	}
 
-	GameMode->OnItemFirstInteractedDelegate.AddDynamic(this, &ADialogueManagerActor::ShowDialogue);
+	GameMode->OnItemInteractedDelegate.AddDynamic(this, &ADialogueManagerActor::ShowDialogue);
 
 
-	if(DialogueWidgetClass)
+	if (DialogueWidgetClass)
 	{
 		DialogueWidget = CreateWidget<UUserWidget>(GetWorld(), DialogueWidgetClass);
 
-		if(DialogueWidget)
+		if (DialogueWidget)
 		{
 			DialogueWidget->AddToViewport();
 			DialogueWidget->SetVisibility(ESlateVisibility::Hidden);
@@ -39,7 +40,7 @@ void ADialogueManagerActor::BeginPlay()
 			//get text block from widget
 			DialogueTextBlock = Cast<UTextBlock>(DialogueWidget->GetWidgetFromName(TEXT("Dialogue")));
 
-			if(!DialogueTextBlock)
+			if (!DialogueTextBlock)
 			{
 				UE_LOG(LogTemp, Error, TEXT("Failed to get Dialogue text block"));
 			}
@@ -58,7 +59,6 @@ void ADialogueManagerActor::BeginPlay()
 }
 
 
-
 void ADialogueManagerActor::ShowDialogue(const FString& ItemName)
 {
 	//format message
@@ -67,12 +67,14 @@ void ADialogueManagerActor::ShowDialogue(const FString& ItemName)
 	UE_LOG(LogTemp, Warning, TEXT("Should display dialogue: %s"), *Message.ToString());
 
 	DialogueTextBlock->SetText(Message);
-	DialogueWidget->SetVisibility(ESlateVisibility::Visible);
+
+	if (DialogueWidget)
+		DialogueWidget->SetVisibility(ESlateVisibility::Visible);
 
 
 	FTimerHandle TimerHandle;
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this]() {
 		DialogueWidget->SetVisibility(ESlateVisibility::Hidden);
-	}, 5.0f, false);
+		}, 5.0f, false);
 }
 

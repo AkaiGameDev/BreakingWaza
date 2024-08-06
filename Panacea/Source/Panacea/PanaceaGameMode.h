@@ -11,7 +11,6 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnIngredientAdded, const FString&, 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnBadEnding);
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnItemInteracted, const FString&, ItemName);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnItemFirstInteracted, const FString&, StringId);
 
 UCLASS(minimalapi)
 class APanaceaGameMode : public AGameModeBase
@@ -29,10 +28,6 @@ public:
 
 	UPROPERTY(BlueprintAssignable)
 	FOnItemInteracted OnItemInteractedDelegate;
-
-	UPROPERTY(BlueprintAssignable, Category = "Items")
-	FOnItemFirstInteracted OnItemFirstInteractedDelegate;
-
 	// The widget class to use for good ending
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UI")
 	TSubclassOf<UUserWidget> GoodEndingWidgetClass;
@@ -67,8 +62,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void BroadcastOnItemInteracted(const FString& IngredientName);
 
-	UFUNCTION(BlueprintCallable)
-	void BroadcastOnItemFirstInteracted(const FString& StringId);
+	TArray<FString> GetItemNames() const { return ItemNames; }
 
 private:
 

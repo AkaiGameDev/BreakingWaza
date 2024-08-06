@@ -14,23 +14,23 @@ UCLASS(ABSTRACT)
 class PANACEA_API AItem : public AActor, public IIInteractableItem
 {
 	GENERATED_BODY()
-	
 
-public:	
+
+public:
 
 	AItem() {
-		
+
 	}
 
 	UPROPERTY(EditAnywhere)
-		bool Interactable;
+	bool Interactable;
 
 	UPROPERTY(EditAnywhere)
-		FString InteractableTrigger;
+	FString InteractableTrigger;
 
 	//Flag that controls whether the player can pick up the item
 	UPROPERTY(EditAnywhere)
-		bool Grabbable;
+	bool Grabbable;
 
 	virtual void BeginPlay() override {
 
@@ -47,7 +47,7 @@ public:
 		// Set this actor to call Tick() every frame. You can turn this off to improve performance if you don't need it.
 		PrimaryActorTick.bCanEverTick = true;
 		GameMode->OnItemInteractedDelegate.AddDynamic(this, &AItem::CheckInteractable);
-		GameMode->OnItemFirstInteractedDelegate.AddDynamic(this, &AItem::FirstInteraction);
+		//GameMode->OnItemFirstInteractedDelegate.AddDynamic(this, &AItem::FirstInteraction);
 	}
 
 	virtual void Broadcast() override {
@@ -95,7 +95,7 @@ public:
 	}
 
 	UFUNCTION()
-	virtual void FirstInteraction(const FString& itemInteracted)
+	virtual void FirstInteraction()
 	{
 		APanaceaGameMode* GameMode = Cast<APanaceaGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 
@@ -105,8 +105,11 @@ public:
 			return;
 		}
 
-		const FText Message = FText::Format(FText::FromString("FT_"), FText::FromString(GetActorNameOrLabel()));
-		GameMode->OnItemFirstInteractedDelegate.Broadcast(Message.ToString());
+		FString ItemID = "FT_" + GetActorNameOrLabel();
+
+		bool bIsFirst = !GameMode->GetItemNames().Contains(ItemID);
+		if (bIsFirst)
+			GameMode->OnItemInteractedDelegate.Broadcast(ItemID);
 	}
 
 	UFUNCTION()

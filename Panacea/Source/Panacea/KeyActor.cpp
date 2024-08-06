@@ -7,8 +7,7 @@
 
 void AKeyActor::Interact()
 {
-
-	FirstInteraction(GetName());
+	FirstInteraction();
 
 
 	bool bIsChestOverlapping = false;
