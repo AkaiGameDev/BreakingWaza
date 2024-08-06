@@ -62,6 +62,16 @@ void APanaceaGameMode::BroadcastOnItemInteracted(const FString& IngredientName)
 	OnItemInteractedDelegate.Broadcast(IngredientName);
 }
 
+void APanaceaGameMode::BroadcastOnItemFirstInteracted(const FString& StringId)
+{
+	if(ItemNames.Contains(StringId))
+	{
+		return;
+	}
+	ItemNames.Add(StringId);
+	OnItemFirstInteractedDelegate.Broadcast(StringId);
+}
+
 void APanaceaGameMode::CheckGoodEnding()
 {
 	if (IngredientNames.Num() > 1)
