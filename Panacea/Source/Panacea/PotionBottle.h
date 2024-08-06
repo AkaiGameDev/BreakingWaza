@@ -32,6 +32,9 @@ public:
 	USwitchComponent* SwitchComponent;
 
 	UPROPERTY(EditAnywhere)
+	TSubclassOf<AItem> ActorToSpawn;
+
+	UPROPERTY(EditAnywhere)
 	float BreakableDistance;
 
 protected:

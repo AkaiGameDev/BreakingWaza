@@ -71,7 +71,7 @@ void APanaceaGameMode::BroadcastOnItemInteracted(const FString& IngredientName)
 
 void APanaceaGameMode::CheckGoodEnding()
 {
-	if (IngredientNames.Num() > 1)
+	if (IngredientNames.Contains("Amber_AlchemyCircle") && IngredientNames.Contains("Hair_AlchemyCircle") && IngredientNames.Contains("Mushroom_AlchemyCircle"))
 	{
 		if (GoodEndingWidgetClass)
 		{

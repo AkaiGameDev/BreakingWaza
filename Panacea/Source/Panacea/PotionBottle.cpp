@@ -51,6 +51,8 @@ void APotionBottle::OnComponentFracture(const FChaosBreakEvent& BreakEvent)
 	{
 		bIsBreaked = true;
 
+		
+
 		Interact();
 
 		Broadcast();
@@ -62,6 +64,41 @@ void APotionBottle::OnComponentFracture(const FChaosBreakEvent& BreakEvent)
 		if (InteractiveComponent)
 		{
 			InteractiveComponent->ResetActorInFocus(this);
+
+			if (ActorToSpawn)
+			{
+
+				// Get the location and rotation of the current actor
+				FVector SpawnLocation = BreakEvent.Location;
+				FRotator SpawnRotation = GetActorRotation();
+
+				// Spawn the new actor
+				AItem* SpawnedActor = GetWorld()->SpawnActor<AItem>(ActorToSpawn, SpawnLocation, SpawnRotation);
+				
+				if(SpawnedActor)
+				{
+					SpawnedActor->SetActorLabel("Amber");
+
+					UStaticMeshComponent* MeshComponent = SpawnedActor->FindComponentByClass<UStaticMeshComponent>();
+					if (MeshComponent)
+					{
+						FVector Origin, BoxBounds;
+						MeshComponent->GetLocalBounds(Origin, BoxBounds);
+						FVector ActorScale = MeshComponent->GetComponentScale();
+						BoxBounds = BoxBounds * ActorScale;
+						SpawnedActor->SetActorLocation(SpawnLocation + FVector::UpVector * BoxBounds.Z * 0.5f);
+					}
+
+					SpawnedActor->Interactable = true;
+
+					/*APanaceaGameMode* GameMode = Cast<APanaceaGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+					if (GameMode)
+					{
+						GameMode->OnIngredientAdded.Broadcast(SpawnedActor->GetActorNameOrLabel());
+					}*/
+				}
+
+			}
 		}
 	}
 }
