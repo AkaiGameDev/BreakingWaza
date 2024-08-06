@@ -413,8 +413,7 @@ void UInteractiveComponent::ResetActorInFocus(AActor* OtherActor, bool bRemoveAc
 		if (!ActorInFocusInteractable)
 			return;
 
-		ActorInFocusInteractable->OnInteractableOutOfRange();
-		HintInteractionWidget->SetVisibility(ESlateVisibility::Hidden);
+		HideActor(ActorInFocus);
 
 		bIsHolding = false;
 	}
@@ -437,6 +436,16 @@ void UInteractiveComponent::ResetActorInFocus(AActor* OtherActor, bool bRemoveAc
 			HintInteractionWidget->SetVisibility(ESlateVisibility::Visible);
 		}
 	}
+}
+
+void UInteractiveComponent::HideActor(AActor* ActorToHide)
+{
+	AItem* Ingredient = Cast<AItem>(ActorToHide);
+	if (!Ingredient)
+		return;
+
+	Ingredient->OnInteractableOutOfRange();
+	HintInteractionWidget->SetVisibility(ESlateVisibility::Hidden);
 }
 
 void UInteractiveComponent::SetAndStartMovement(const FVector& TargetVector, const FRotator& TargetRotator, bool bIsRelease)

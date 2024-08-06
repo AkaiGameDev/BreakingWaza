@@ -30,6 +30,8 @@ public:
 
     void ResetActorInFocus(AActor* OtherActor, bool bRemoveActor = true);
 
+    void HideActor(AActor* ActorToHide);
+
     void SetAndStartMovement(const FVector& TargetVector, const FRotator& TargetRotator, bool bIsRelease);
 
     UPROPERTY(EditAnywhere)
