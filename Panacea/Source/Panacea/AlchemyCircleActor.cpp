@@ -24,8 +24,6 @@ void AAlchemyCircleActor::BeginPlay()
 {
 	Super::BeginPlay();
 
-	PlayerCharacter = Cast<APanaceaCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
-
 
 	ACharacter* TempCharacter = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
 	if (!TempCharacter)
@@ -50,23 +48,21 @@ void AAlchemyCircleActor::BeginPlay()
 }
 
 void AAlchemyCircleActor::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
-                                         UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
-                                         const FHitResult& SweepResult)
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
+	const FHitResult& SweepResult)
 {
 	AItem* Ingredient = Cast<AItem>(OtherActor);
 	if (!Ingredient)
 		return;
 
-	if (Ingredient)
+
+	if (IngredientNameToPlace == Ingredient->GetActorNameOrLabel())
 	{
-		if (IngredientNameToPlace == Ingredient->GetActorNameOrLabel())
+		if (InteractiveComponent && (InteractiveComponent->bIsHolding))
 		{
-			if (InteractiveComponent && !(InteractiveComponent->bIsHolding))
-			{
-				Ingredient->SetNotInteractable();
-				InteractiveComponent->ResetActorInFocus(Ingredient);
-				UE_LOG(LogTemp, Warning, TEXT("Ingredient added: %s"), *Ingredient->GetActorNameOrLabel());
-			}
+			Ingredient->SetNotInteractable();
+			InteractiveComponent->HideActor(Ingredient);
+			Broadcast();
 		}
 	}
 }
