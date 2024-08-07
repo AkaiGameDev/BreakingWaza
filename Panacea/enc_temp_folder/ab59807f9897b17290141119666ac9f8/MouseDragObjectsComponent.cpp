@@ -17,7 +17,7 @@ UMouseDragObjectsComponent::UMouseDragObjectsComponent()
 {
 	PrimaryComponentTick.bCanEverTick = true;
 	bIsGrabMode = false;
-	TraceSpehereRadius = 10.0f;
+	TraceSpehereRadius = 2.0f;
 	PhysicsHandle = CreateDefaultSubobject<UPhysicsHandleComponent>(TEXT("MousePhysicsHandle"));
 }
 

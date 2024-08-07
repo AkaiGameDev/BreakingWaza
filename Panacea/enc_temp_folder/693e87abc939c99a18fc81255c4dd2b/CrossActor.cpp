@@ -68,7 +68,7 @@ void ACrossActor::Interact()
 	if (AngleDifferenceDegrees > MinimumDegrees)
 	{
 		Broadcast();
-		//SetNotInteractable();
+		SetNotInteractable();
 
 		ACharacter* Character = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
 		UInteractiveComponent* InteractiveComponent = Character->GetComponentByClass<UInteractiveComponent>();
