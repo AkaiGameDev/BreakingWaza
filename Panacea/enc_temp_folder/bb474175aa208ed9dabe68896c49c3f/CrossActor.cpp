@@ -47,6 +47,15 @@ void ACrossActor::Interact()
 		SwitchComponent->SwitchCamera();
 	}
 
+
+	ACharacter* Character = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
+	UInteractiveComponent* InteractiveComponent = Character->GetComponentByClass<UInteractiveComponent>();
+
+	if (InteractiveComponent)
+	{
+		InteractiveComponent->bIsHolding = !InteractiveComponent->bIsHolding;
+	}
+
 	FVector FinalAngleVector = StaticMeshComponent->GetComponentRotation().Vector();
 
 	// Normalize the vectors
@@ -68,10 +77,7 @@ void ACrossActor::Interact()
 	if (AngleDifferenceDegrees > MinimumDegrees)
 	{
 		Broadcast();
-		SetNotInteractable();
-
-		ACharacter* Character = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
-		UInteractiveComponent* InteractiveComponent = Character->GetComponentByClass<UInteractiveComponent>();
+		//SetNotInteractable();
 
 		if (InteractiveComponent)
 		{
