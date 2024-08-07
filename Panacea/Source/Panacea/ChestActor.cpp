@@ -51,6 +51,15 @@ void AChestActor::Interact()
 		SwitchComponent->SwitchCamera();
 	}
 
+
+	ACharacter* Character = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
+	UInteractiveComponent* InteractiveComponent = Character->GetComponentByClass<UInteractiveComponent>();
+
+	if (InteractiveComponent)
+	{
+		InteractiveComponent->bIsHolding = !InteractiveComponent->bIsHolding;
+	}
+
 	FVector FinalAngleVector = TopStaticMeshComponent->GetComponentRotation().Vector();
 
 	//// Normalize the vectors
@@ -73,9 +82,6 @@ void AChestActor::Interact()
 	{
 		Broadcast();
 		SetNotInteractable();
-
-		ACharacter* Character = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
-		UInteractiveComponent* InteractiveComponent = Character->GetComponentByClass<UInteractiveComponent>();
 
 		if (InteractiveComponent)
 		{
