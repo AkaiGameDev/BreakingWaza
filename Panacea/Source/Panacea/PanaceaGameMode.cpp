@@ -13,9 +13,7 @@ APanaceaGameMode::APanaceaGameMode()
 	//static ConstructorHelpers::FClassFinder<APawn> PlayerPawnClassFinder(TEXT("/Game/Blueprints/BP_FirstPersonCharacter"));
 	//DefaultPawnClass = PlayerPawnClassFinder.Class;
 
-	OnItemInteractedDelegate.AddDynamic(this, &APanaceaGameMode::RecordItemInteraction); //change this to a new function to record items interacted w
-	OnIngredientAdded.AddDynamic(this, &APanaceaGameMode::RecordIngredient);
-	OnBadEnding.AddDynamic(this, &APanaceaGameMode::OnBadEndingSequence);
+	
 }
 
 
@@ -23,7 +21,9 @@ void APanaceaGameMode::BeginPlay()
 {
 	Super::BeginPlay();
 
-	
+	OnItemInteractedDelegate.AddDynamic(this, &APanaceaGameMode::RecordItemInteraction); //change this to a new function to record items interacted w
+	OnIngredientAdded.AddDynamic(this, &APanaceaGameMode::RecordIngredient);
+	OnBadEnding.AddDynamic(this, &APanaceaGameMode::OnBadEndingSequence);
 }
 
 void APanaceaGameMode::RecordIngredient(const FString& IngredientName)
