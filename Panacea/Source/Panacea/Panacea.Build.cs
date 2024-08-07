@@ -8,16 +8,9 @@ public class Panacea : ModuleRules
     {
         PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
-        PublicDependencyModuleNames.AddRange(new string[] {
-            "Core",
-            "CoreUObject",
-            "Engine",
-            "InputCore",
-            "EnhancedInput",
-            "UMG",
-            "PhysicsCore",
-            "Chaos",
-            "GeometryCollectionEngine"
+        PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore",
+            "EnhancedInput", "UMG","Json", "JsonUtilities"
+            , "MetasoundEngine"
         });
 
         PublicIncludePaths.AddRange(
