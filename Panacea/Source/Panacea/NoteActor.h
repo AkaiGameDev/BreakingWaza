@@ -28,6 +28,8 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	bool bOppened = false;
+
 public:
 	virtual void Interact() override;
 };
